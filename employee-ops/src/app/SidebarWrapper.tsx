@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import Sidebar from "./components/Sidebar"; // adjust path if needed
+import Sidebar from "./components/Sidebar";
 
 export default function SidebarWrapper() {
-  const [isOpen, setIsOpen] = useState(true);
+  // Start closed on mobile — lg: always visible via CSS translate
+  const [isOpen, setIsOpen] = useState(false);
   return <Sidebar isOpen={isOpen} closeSidebar={() => setIsOpen(false)} />;
 }

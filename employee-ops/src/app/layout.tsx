@@ -1,22 +1,33 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { DM_Sans, Playfair_Display, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import SidebarWrapper from "./SidebarWrapper";
 import "leaflet/dist/leaflet.css";
+import AppShell from "./appshell";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const dmSans = DM_Sans({
   subsets: ["latin"],
+  variable: "--font-dm-sans",
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const playfair = Playfair_Display({
   subsets: ["latin"],
+  variable: "--font-playfair",
+  display: "swap",
+});
+
+const jetbrains = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
+  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
-  title: "Employee & Ops Hub",
-  description: "Workforce automation portal",
+  title: "Hansonium — Employee & Operations Hub",
+  description: "Agentic rostering, compliance vault, DEX audit lab and staff directory.",
+  keywords: ["NDIS", "employee portal", "compliance", "DEX audit", "rostering"],
+  authors: [{ name: "Hansonium" }],
 };
 
 export default function RootLayout({
@@ -25,16 +36,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <div className="flex h-screen bg-gray-100">
-          <SidebarWrapper />
-          <main className="flex-1 p-8 overflow-auto">
-            {children}
-          </main>
-        </div>
+    <html
+      lang="en"
+      className={`${dmSans.variable} ${playfair.variable} ${jetbrains.variable} h-full`}
+    >
+      <body className="antialiased bg-[#faf9f7] text-[#1a1a2e] h-full overflow-x-hidden">
+        <AppShell>
+          {children}
+        </AppShell>
       </body>
     </html>
   );
