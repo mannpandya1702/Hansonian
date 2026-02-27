@@ -1,6 +1,7 @@
 import './globals.css'
-import Link from 'next/link'
+import { Metadata } from 'next'
 import { Playfair_Display, DM_Sans, JetBrains_Mono } from 'next/font/google'
+import { AdminSidebar } from './components/Sidebar'
 
 const playfair = Playfair_Display({
   subsets: ['latin'],
@@ -20,6 +21,13 @@ const mono = JetBrains_Mono({
   display: 'swap',
 })
 
+export const metadata: Metadata = {
+  title: 'Hansonium — Admin & CEO Command Center',
+  description: 'Executive oversight: NDIS financial pulse, DEX compliance, strategic alerts and AI insights.',
+  keywords: ['NDIS', 'CEO dashboard', 'DEX compliance', 'Hansonium admin'],
+  authors: [{ name: 'Hansonium' }],
+}
+
 export default function RootLayout({
   children,
 }: {
@@ -28,51 +36,22 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${playfair.variable} ${dmSans.variable} ${mono.variable}`}
+      className={`${playfair.variable} ${dmSans.variable} ${mono.variable} h-full`}
     >
-      <body className="bg-[#faf9f7] font-[var(--font-dm)] min-h-screen antialiased overflow-x-hidden">
+      <body className="bg-[#faf9f7] text-[#1a1a2e] min-h-screen antialiased overflow-x-hidden">
+        <div className="flex h-full min-h-screen">
+          {/* Sidebar */}
+          <AdminSidebar />
 
-        {/* 🔹 Navbar */}
-        <nav className="w-full border-b bg-white">
-          <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8">
-            
-            <div className="py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              
-              {/* Title */}
-              <h1 className="text-lg sm:text-xl md:text-2xl font-semibold font-[var(--font-playfair)] leading-tight">
-                Dashboard
-              </h1>
-
-              {/* Navigation Links */}
-              <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-sm sm:text-base">
-                <Link
-                  href="/"
-                  className="hover:opacity-70 transition whitespace-nowrap"
-                >
-                  Home
-                </Link>
-
-                {/*
-                <Link
-                  href="/non-compliant"
-                  className="hover:opacity-70 transition whitespace-nowrap"
-                >
-                  Non-Compliant
-                </Link>
-                */}
-              </div>
-
-            </div>
+          {/* Main content area */}
+          <div className="flex-1 flex flex-col min-w-0">
+            {/* Spacer for mobile top bar height */}
+            <div className="lg:hidden h-14 shrink-0" />
+            <main className="flex-1 overflow-y-auto">
+              {children}
+            </main>
           </div>
-        </nav>
-
-        {/* 🔹 Page Content */}
-        <main className="flex-1">
-          <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 py-6 sm:py-8 md:py-10">
-            {children}
-          </div>
-        </main>
-
+        </div>
       </body>
     </html>
   )

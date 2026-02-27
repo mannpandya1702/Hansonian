@@ -79,29 +79,33 @@ const zoneRiskData = [
 
 export default function Dashboard() {
   return (
-    <div className="min-h-screen bg-[#faf9f7] text-[#1a1a2e] overflow-x-hidden">
+    <div className="min-h-screen bg-[#faf9f7] text-[#1a1a2e] overflow-x-hidden pb-10">
 
-      {/* HEADER */}
-      <header className="bg-[#1a1a2e] text-white">
-        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-10 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-
-          <h1 className="text-lg sm:text-xl md:text-2xl font-(--font-playfair)] text-center sm:text-left wrap-break-words">
-            Hansonium Agentic OS
-          </h1>
-
-          <div className="flex flex-wrap justify-center sm:justify-end items-center gap-3 text-xs sm:text-sm">
-            <span className="bg-[#4ade80] text-[#1a1a2e] px-3 py-1 rounded-full font-semibold whitespace-nowrap">
-              CEO
-            </span>
-            <span className="opacity-70 whitespace-nowrap">
-              Updated 5 mins ago
-            </span>
+      {/* Page header */}
+      <div className="px-4 sm:px-6 md:px-10 pt-6 sm:pt-8 pb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div>
+            <h1
+              className="text-2xl sm:text-3xl font-semibold text-[#1a1a2e] leading-tight"
+              style={{ fontFamily: "var(--font-playfair, Georgia, serif)" }}
+            >
+              CEO Command Center
+            </h1>
+            <p className="text-sm text-[#4a4a6a] mt-1">
+              Financial pulse, DEX compliance &amp; strategic alerts
+            </p>
           </div>
-
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest bg-[#4ade80]/15 text-[#16a34a] px-3 py-1.5 rounded-full border border-[#4ade80]/30">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#4ade80] animate-pulse" />
+              Live
+            </span>
+            <span className="text-xs text-[#4a4a6a]">Updated 5 mins ago</span>
+          </div>
         </div>
-      </header>
+      </div>
 
-      <main className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-10 py-6 sm:py-8 space-y-10">
+      <main className="px-4 sm:px-6 md:px-10 space-y-8">
 
         {/* FINANCIAL PULSE */}
         <section className="bg-white rounded-2xl border border-[#e8e4dd] p-4 sm:p-6 md:p-8 space-y-8">
