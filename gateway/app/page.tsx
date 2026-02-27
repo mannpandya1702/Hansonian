@@ -10,8 +10,8 @@ import { useState } from "react";
 
 const PORTAL_URLS = {
   admin: process.env.NEXT_PUBLIC_ADMIN_URL ?? "https://hansonianadminfinal.vercel.app/",
-  employee: process.env.NEXT_PUBLIC_EMPLOYEE_URL ?? "http://localhost:3002",
-  family: process.env.NEXT_PUBLIC_FAMILY_URL ?? "http://localhost:3003",
+  employee: process.env.NEXT_PUBLIC_EMPLOYEE_URL ?? "https://hansonianemployeefinal.vercel.app/",
+  family: process.env.NEXT_PUBLIC_FAMILY_URL ?? "https://hansonian-family-final.vercel.app/",
 };
 
 // Demo credentials — replace with Firebase Auth in production
