@@ -8,19 +8,19 @@ export default function Home() {
   const [error, setError] = useState("");
 
   const users: Record<string, { password: string; redirect: string }> = {
-    "admin@hansonium.com": {
-      password: "admin123",
-      redirect: "http://localhost:3001",
-    },
-    "employee@hansonium.com": {
-      password: "employee123",
-      redirect: "http://localhost:3002",
-    },
-    "family@hansonium.com": {
-      password: "family123",
-      redirect: "http://localhost:3003",
-    },
-  };
+  "admin@hansonium.com": {
+    password: "admin123",
+    redirect: "https://admin-web-ashy.vercel.app",
+  },
+  "employee@hansonium.com": {
+    password: "employee123",
+    redirect: "https://employee-ops-n96v.vercel.app",
+  },
+  "family@hansonium.com": {
+    password: "family123",
+    redirect: "https://family-portal-sigma.vercel.app",
+  },
+};
 
   const handleLogin = () => {
     const user = users[email];
