@@ -165,45 +165,7 @@ This audit documents all changes made to the Hansonian OS monorepo to bring the 
 | **Overlay** | `bg-black/40` | `bg-black/50 backdrop-blur-sm` |
 | **Env support** | None | `NEXT_PUBLIC_GATEWAY_URL` for logout |
 
-### 2.4 Family Portal — Version Standardization
-
-**Files Modified:**
-- `family-portal/package.json`
-- `family-portal/styles/globals.css`
-- `family-portal/app/layout.tsx`
-- `family-portal/tsconfig.json`
-
-**Files Created:**
-- `family-portal/postcss.config.mjs`
-- `family-portal/next.config.ts`
-- `family-portal/eslint.config.mjs`
-
-**Files Removed:**
-- `family-portal/postcss.config.js` (replaced by `.mjs`)
-- `family-portal/tailwind.config.ts` (replaced by `@theme` in CSS)
-- `family-portal/next.config.js` (replaced by `.ts`)
-
-**Changes:**
-| What | Before | After |
-|------|--------|-------|
-| Next.js | `^14.0.4` | `16.1.6` |
-| React | `^18.2.0` | `19.2.3` |
-| Tailwind CSS | `^3.4.0` (config file) | `^4` (CSS-first `@theme` block) |
-| PostCSS config | `postcss.config.js` (tailwindcss + autoprefixer) | `postcss.config.mjs` (`@tailwindcss/postcss`) |
-| Next config | `next.config.js` (CommonJS) | `next.config.ts` (TypeScript + `transpilePackages`) |
-| ESLint | `^8.56.0` + `next lint` | `^9` + `eslint.config.mjs` flat config |
-| TypeScript target | `es5` | `ES2017` |
-| JSX transform | `preserve` | `react-jsx` |
-| Metadata viewport | `metadata.viewport` (deprecated) | Separate `export const viewport: Viewport` |
-| Tailwind config | `tailwind.config.ts` (JS object) | `@theme {}` block in `globals.css` |
-| CSS directives | `@tailwind base/components/utilities` | `@import "tailwindcss"` |
-| lucide-react | `^0.294.0` | `^0.575.0` |
-| recharts | `^2.10.3` | `^3.7.0` |
-| react-leaflet | `^4.2.1` | `^5.0.0` |
-
-> **Zero frontend/UI changes.** All existing components, pages, and styling remain identical. Only tooling and dependency versions were aligned.
-
-### 2.5 Design System Standardization
+### 2.4 Design System Standardization
 
 All portals now share identical design tokens:
 
@@ -247,7 +209,7 @@ All portals now share identical design tokens:
 | US.E3 | DEX Audit Lab with Batch Approve | `/dex-audit` |
 | US.E3 | Schema mapping validation, status filter | `/dex-audit` |
 
-### Portal 4 — Patient & Family Portal (standardized to Next.js 16 / Tailwind v4)
+### Portal 4 — Patient & Family Portal (unchanged — reference portal)
 | Story | Feature | Location |
 |-------|---------|----------|
 | US.P1 | Transparency Feed — caregiver timeline | `/` — Family Portal |
@@ -283,6 +245,7 @@ All portals now share identical design tokens:
 | Set Firebase custom user claims | High | Required for proper role-based Firestore rules |
 | Add Firebase Auth guard to each portal | High | Redirect to gateway if not authenticated |
 | Caregiver Mobile App completion | Medium | Flutter UI only, no backend connection |
+| Standardize family portal to Next.js 16 | Medium | Currently on Next.js 14 / React 18 |
 | Email/SMS notifications | Medium | NDIS low-rating escalation, credential expiry alerts |
 | Real-time data from Firestore | Medium | Replace mock data with live Firestore hooks |
 | Error boundaries | Medium | Add `error.tsx` to each portal |
@@ -309,10 +272,6 @@ employee-ops/src/app/appshell.tsx                   — Fixed mobile top bar, co
 employee-ops/src/app/dashboard/dashboardlayout.tsx  — Simplified to passthrough
 employee-ops/src/app/page.tsx                       — Redirects to /dashboard
 employee-ops/src/app/compliance/page.tsx            — Color/style updates, overflow-x-auto
-family-portal/package.json                          — Next.js 16 / React 19 / Tailwind v4
-family-portal/styles/globals.css                    — Tailwind v4 @import + @theme migration
-family-portal/app/layout.tsx                        — Viewport export (Next.js 16 compat)
-family-portal/tsconfig.json                         — ES2017 target, react-jsx
 ```
 
 ### Files Created
@@ -327,21 +286,10 @@ admin-web/.env.local                                — Environment config
 admin-web/.env.example                              — Template
 employee-ops/.env.local                             — Environment config
 employee-ops/.env.example                           — Template
-family-portal/postcss.config.mjs                    — Tailwind v4 PostCSS plugin
-family-portal/next.config.ts                        — TypeScript Next.js config
-family-portal/eslint.config.mjs                     — ESLint v9 flat config
 SETUP.md                                            — Complete project setup guide
 AUDIT_REPORT.md                                     — This document
-SYSTEM_INSTRUCTIONS.md                              — System architecture & instructions
-```
-
-### Files Removed
-```
-family-portal/postcss.config.js                     — Replaced by postcss.config.mjs
-family-portal/tailwind.config.ts                    — Replaced by @theme in globals.css
-family-portal/next.config.js                        — Replaced by next.config.ts
 ```
 
 ---
 
-*Audit completed February 28, 2026 — Hansonian OS Production Refactor (version alignment pass).*
+*Audit completed February 27, 2026 — Hansonian OS Production Refactor.*
