@@ -5,9 +5,106 @@
 
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+/* ============================================
+   TAILWIND V4 THEME — HANSONIUM BRAND TOKENS
+   ============================================ */
+
+@theme {
+  /* Brand Colors */
+  --color-hansonium-primary:          #1a1a2e;
+  --color-hansonium-primary-light:    #252540;
+  --color-hansonium-primary-dark:     #0f0f1a;
+
+  --color-hansonium-accent:           #4ade80;
+  --color-hansonium-accent-light:     #86efac;
+  --color-hansonium-accent-dark:      #22c55e;
+  --color-hansonium-accent-muted:     #166534;
+
+  --color-hansonium-cream:            #faf9f7;
+  --color-hansonium-cream-dark:       #f5f3ef;
+  --color-hansonium-sand:             #e8e4dd;
+
+  --color-hansonium-text-primary:     #1a1a2e;
+  --color-hansonium-text-secondary:   #6b7280;
+  --color-hansonium-text-muted:       #9ca3af;
+  --color-hansonium-text-inverse:     #ffffff;
+
+  /* Status Colors (NDIS Compliance) */
+  --color-hansonium-success:          #22c55e;
+  --color-hansonium-warning:          #f59e0b;
+  --color-hansonium-danger:           #ef4444;
+  --color-hansonium-info:             #3b82f6;
+
+  /* Budget Category Colors */
+  --color-hansonium-core-support:     #8b5cf6;
+  --color-hansonium-capacity-building:#06b6d4;
+  --color-hansonium-capital:          #f97316;
+
+  /* Typography */
+  --font-sans:    'DM Sans', system-ui, sans-serif;
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-mono:    'JetBrains Mono', monospace;
+
+  /* Border Radius */
+  --radius-premium:    1.25rem;
+  --radius-premium-lg: 1.5rem;
+
+  /* Shadows */
+  --shadow-premium:    0 4px 20px -2px rgba(26, 26, 46, 0.1), 0 2px 8px -2px rgba(26, 26, 46, 0.06);
+  --shadow-premium-lg: 0 10px 40px -4px rgba(26, 26, 46, 0.12), 0 4px 16px -4px rgba(26, 26, 46, 0.08);
+  --shadow-premium-xl: 0 20px 60px -8px rgba(26, 26, 46, 0.15), 0 8px 24px -8px rgba(26, 26, 46, 0.1);
+  --shadow-glow-green: 0 0 20px rgba(74, 222, 128, 0.3);
+
+  /* Animations */
+  --animate-fade-in:        fadeIn 0.6s ease-out forwards;
+  --animate-slide-up:       slideUp 0.6s ease-out forwards;
+  --animate-slide-in-right: slideInRight 0.5s ease-out forwards;
+  --animate-scale-in:       scaleIn 0.4s ease-out forwards;
+  --animate-pulse-soft:     pulseSoft 2s ease-in-out infinite;
+  --animate-shimmer:        shimmer 2s linear infinite;
+  --animate-float:          float 6s ease-in-out infinite;
+}
+
+/* ============================================
+   KEYFRAME ANIMATIONS
+   ============================================ */
+
+@keyframes fadeIn {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes slideUp {
+  0%   { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInRight {
+  0%   { opacity: 0; transform: translateX(20px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scaleIn {
+  0%   { opacity: 0; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pulseSoft {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.7; }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
 
 /* ============================================
    CSS CUSTOM PROPERTIES
@@ -15,40 +112,40 @@
 
 :root {
   /* Brand Colors */
-  --color-primary: #1a1a2e;
+  --color-primary:       #1a1a2e;
   --color-primary-light: #252540;
-  --color-primary-dark: #0f0f1a;
-  
-  --color-accent: #4ade80;
-  --color-accent-light: #86efac;
-  --color-accent-dark: #22c55e;
-  --color-accent-muted: #166534;
-  
-  --color-cream: #faf9f7;
-  --color-cream-dark: #f5f3ef;
-  --color-sand: #e8e4dd;
+  --color-primary-dark:  #0f0f1a;
+
+  --color-accent:        #4ade80;
+  --color-accent-light:  #86efac;
+  --color-accent-dark:   #22c55e;
+  --color-accent-muted:  #166534;
+
+  --color-cream:         #faf9f7;
+  --color-cream-dark:    #f5f3ef;
+  --color-sand:          #e8e4dd;
 
   /* Fluid Typography */
-  --font-size-xs: clamp(0.75rem, 0.7rem + 0.2vw, 0.875rem);
-  --font-size-sm: clamp(0.875rem, 0.8rem + 0.3vw, 1rem);
-  --font-size-base: clamp(1rem, 0.95rem + 0.4vw, 1.125rem);
-  --font-size-lg: clamp(1.25rem, 1.1rem + 0.8vw, 1.75rem);
-  --font-size-xl: clamp(1.75rem, 1.4rem + 1.5vw, 2.5rem);
+  --font-size-xs:   clamp(0.75rem,  0.7rem  + 0.2vw, 0.875rem);
+  --font-size-sm:   clamp(0.875rem, 0.8rem  + 0.3vw, 1rem);
+  --font-size-base: clamp(1rem,     0.95rem + 0.4vw, 1.125rem);
+  --font-size-lg:   clamp(1.25rem,  1.1rem  + 0.8vw, 1.75rem);
+  --font-size-xl:   clamp(1.75rem,  1.4rem  + 1.5vw, 2.5rem);
 
   /* Spacing */
-  --spacing-premium: clamp(1rem, 2vw, 1.5rem);
+  --spacing-premium:       clamp(1rem, 2vw, 1.5rem);
   --border-radius-premium: 1.25rem;
 
   /* Shadows */
-  --shadow-premium: 0 4px 20px -2px rgba(26, 26, 46, 0.1),
-                    0 2px 8px -2px rgba(26, 26, 46, 0.06);
+  --shadow-premium:    0 4px 20px -2px rgba(26, 26, 46, 0.1),
+                       0 2px 8px -2px rgba(26, 26, 46, 0.06);
   --shadow-premium-lg: 0 10px 40px -4px rgba(26, 26, 46, 0.12),
                        0 4px 16px -4px rgba(26, 26, 46, 0.08);
 
   /* Fonts */
   --font-display: 'Playfair Display', Georgia, serif;
-  --font-body: 'DM Sans', system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --font-body:    'DM Sans', system-ui, sans-serif;
+  --font-mono:    'JetBrains Mono', monospace;
 
   --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
