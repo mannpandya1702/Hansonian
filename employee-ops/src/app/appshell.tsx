@@ -17,7 +17,7 @@ export default function AppShell({
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-[#faf9f7]">
+    <div className="flex min-h-screen h-full bg-[#faf9f7]">
 
       {/* Sidebar */}
       <Sidebar
