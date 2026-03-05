@@ -40,26 +40,23 @@ const Icons = {
 // ============================================
 // TYPES
 // ============================================
-interface BudgetCategory {
-  name: string;
-  allocated: number;
-  used: number;
-  description: string;
-  stated?: boolean;
+interface Milestone {
+  id: string;
+  label: string;
+  completed: boolean;
 }
 
-interface BudgetSection {
-  total: number;
-  used: number;
-  remaining: number;
-  categories: BudgetCategory[];
+interface ServiceLine {
+  name: string;
+  hoursAllocated: number;
+  hoursUsed: number;
 }
 
 interface Goal {
   id: string;
   title: string;
-  progress: number;
   category: string;
+  milestones: Milestone[];
 }
 
 interface CareTeamMember {
@@ -145,43 +142,55 @@ const mockParticipant = {
   contactPhone: '1800 800 110',
   address: { street: '42 Harmony Lane', suburb: 'Ballarat Central', state: 'VIC', postcode: '3350' },
   goals: [
-    { id: 'g1', title: 'Increase independence in daily living', progress: 65, category: 'Daily Living' },
-    { id: 'g2', title: 'Participate in community activities weekly', progress: 80, category: 'Community' },
-    { id: 'g3', title: 'Develop employment skills', progress: 40, category: 'Employment' },
-    { id: 'g4', title: 'Improve social connections', progress: 55, category: 'Relationships' },
+    {
+      id: 'g1', title: 'Increase independence in daily living', category: 'Daily Living',
+      milestones: [
+        { id: 'm1a', label: 'Complete morning routine independently', completed: true },
+        { id: 'm1b', label: 'Prepare simple meals with minimal assistance', completed: true },
+        { id: 'm1c', label: 'Navigate local shops independently', completed: false },
+        { id: 'm1d', label: 'Manage weekly personal schedule', completed: false },
+      ],
+    },
+    {
+      id: 'g2', title: 'Participate in community activities weekly', category: 'Community',
+      milestones: [
+        { id: 'm2a', label: 'Attend a group activity with support worker', completed: true },
+        { id: 'm2b', label: 'Identify a regular weekly activity of interest', completed: true },
+        { id: 'm2c', label: 'Attend chosen activity independently', completed: true },
+        { id: 'm2d', label: 'Build a regular weekly social routine', completed: false },
+      ],
+    },
+    {
+      id: 'g3', title: 'Develop employment skills', category: 'Employment',
+      milestones: [
+        { id: 'm3a', label: 'Complete a vocational interest assessment', completed: true },
+        { id: 'm3b', label: 'Attend a work skills training session', completed: false },
+        { id: 'm3c', label: 'Complete a supported work trial', completed: false },
+        { id: 'm3d', label: 'Apply for a supported employment position', completed: false },
+      ],
+    },
+    {
+      id: 'g4', title: 'Improve social connections', category: 'Relationships',
+      milestones: [
+        { id: 'm4a', label: 'Identify barriers to social connection', completed: true },
+        { id: 'm4b', label: 'Join a peer support or social group', completed: true },
+        { id: 'm4c', label: 'Maintain regular contact with two people outside family', completed: false },
+        { id: 'm4d', label: 'Initiate a social plan without prompting', completed: false },
+      ],
+    },
   ] as Goal[],
-  budget: {
-    total: 85000,
-    used: 34250,
-    remaining: 50750,
-    coreSupports: {
-      total: 45000, used: 22500, remaining: 22500,
-      categories: [
-        { name: 'Daily Activities', allocated: 25000, used: 14000, description: 'Assistance with self-care, meals, household tasks' },
-        { name: 'Consumables', allocated: 3000, used: 1200, description: 'Everyday items like continence aids' },
-        { name: 'Community Participation', allocated: 12000, used: 5800, description: 'Support to participate in community activities' },
-        { name: 'Transport', allocated: 5000, used: 1500, description: 'Travel to appointments and activities', stated: true },
-      ] as BudgetCategory[],
-    } as BudgetSection,
-    capacityBuilding: {
-      total: 30000, used: 9750, remaining: 20250,
-      categories: [
-        { name: 'Support Coordination', allocated: 8000, used: 3200, description: 'Help to implement your plan' },
-        { name: 'Improved Daily Living', allocated: 12000, used: 4550, description: 'Therapy services - OT, Physio, Speech' },
-        { name: 'Improved Health & Wellbeing', allocated: 5000, used: 1200, description: 'Exercise physiology, dietitian' },
-        { name: 'Employment Support', allocated: 3000, used: 500, description: 'Job training and support' },
-        { name: 'Improved Relationships', allocated: 2000, used: 300, description: 'Social skills, behavioural support' },
-      ] as BudgetCategory[],
-    } as BudgetSection,
-    capitalSupports: {
-      total: 10000, used: 2000, remaining: 8000,
-      categories: [
-        { name: 'Assistive Technology', allocated: 7000, used: 2000, description: 'Equipment, mobility aids, devices', stated: true },
-        { name: 'Home Modifications', allocated: 3000, used: 0, description: 'Bathroom rails, ramps', stated: true },
-      ] as BudgetCategory[],
-    } as BudgetSection,
-    lastUpdated: new Date(),
-  },
+};
+
+const mockProviderAllocation = {
+  month: 'March 2026',
+  hoursAllocated: 48,
+  hoursUsed: 22.5,
+  hoursScheduled: 7.5,
+  services: [
+    { name: 'Daily Personal Activities', hoursAllocated: 24, hoursUsed: 13.5 },
+    { name: 'Community Access', hoursAllocated: 16, hoursUsed: 6 },
+    { name: 'OT Sessions', hoursAllocated: 8, hoursUsed: 3 },
+  ] as ServiceLine[],
 };
 
 const mockCareTeam: CareTeamMember[] = [
@@ -379,12 +388,12 @@ const Sidebar = ({ currentPage, onNavigate, isOpen, onClose }: SidebarProps) => 
     { id: 'dashboard', label: 'Dashboard', icon: Icons.Home },
     { id: 'visits', label: 'Visits', icon: Icons.Calendar },
     { id: 'care-team', label: 'Care Team', icon: Icons.Users },
-    { id: 'budget', label: 'NDIS Budget', icon: Icons.Wallet },
+    { id: 'budget', label: 'My Services', icon: Icons.Wallet },
     { id: 'goals', label: 'Goals', icon: Icons.Target },
     { id: 'documents', label: 'Documents', icon: Icons.FileText },
     { id: 'messages', label: 'Messages', icon: Icons.MessageCircle, badge: mockMessages.filter((m) => !m.isRead).length },
   ];
-  const budgetPercent = Math.round((mockParticipant.budget.used / mockParticipant.budget.total) * 100);
+  const hoursPercent = Math.round((mockProviderAllocation.hoursUsed / mockProviderAllocation.hoursAllocated) * 100);
   const planDays = getDaysRemaining(mockParticipant.planEndDate);
 
   const handleNav = (id: string) => {
@@ -411,8 +420,8 @@ const Sidebar = ({ currentPage, onNavigate, isOpen, onClose }: SidebarProps) => 
         {/* Mini Stats */}
         <div className="px-3 py-2 border-b border-white/10 grid grid-cols-2 gap-2">
           <div className="bg-white/10 rounded-lg px-2.5 py-2">
-            <p className="text-[9px] text-white/50 uppercase">Budget</p>
-            <p className="text-sm font-bold text-[#4ade80]">{budgetPercent}%</p>
+            <p className="text-[9px] text-white/50 uppercase">Hours</p>
+            <p className="text-sm font-bold text-[#4ade80]">{hoursPercent}%</p>
           </div>
           <div className="bg-white/10 rounded-lg px-2.5 py-2">
             <p className="text-[9px] text-white/50 uppercase">Days Left</p>
@@ -454,7 +463,10 @@ const Sidebar = ({ currentPage, onNavigate, isOpen, onClose }: SidebarProps) => 
               <p className="text-[10px] text-white/50">NDIS: {mockParticipant.ndisNumber}</p>
             </div>
           </div>
-          <button className="w-full flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs">
+          <button
+            className="w-full flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs"
+            onClick={() => { localStorage.removeItem('hs_role'); localStorage.removeItem('hs_email'); window.location.href = '/'; }}
+          >
             <Icons.LogOut /><span>Sign Out</span>
           </button>
         </div>
@@ -562,20 +574,15 @@ interface DashboardPageProps {
 }
 
 const DashboardPage = ({ onNavigate, onRate }: DashboardPageProps) => {
-  const budgetPercent = Math.round((mockParticipant.budget.used / mockParticipant.budget.total) * 100);
+  const hoursRemaining = mockProviderAllocation.hoursAllocated - mockProviderAllocation.hoursUsed;
+  const hoursPercent = Math.round((mockProviderAllocation.hoursUsed / mockProviderAllocation.hoursAllocated) * 100);
   const nextVisit = mockUpcomingVisits[0];
 
   const quickStats = [
-    { label: 'Budget Remaining', value: formatCurrency(mockParticipant.budget.remaining), sub: `${100 - budgetPercent}% available`, color: 'from-emerald-500 to-teal-600', page: 'budget' },
+    { label: 'Hours Remaining', value: `${hoursRemaining}h`, sub: `${100 - hoursPercent}% of monthly allocation`, color: 'from-emerald-500 to-teal-600', page: 'budget' },
     { label: 'Upcoming Visits', value: mockUpcomingVisits.length.toString(), sub: 'Next 7 days', color: 'from-blue-500 to-indigo-600', page: 'visits' },
     { label: 'Plan Days Left', value: getDaysRemaining(mockParticipant.planEndDate).toString(), sub: formatDate(mockParticipant.planEndDate), color: 'from-purple-500 to-pink-600', page: 'goals' },
     { label: 'Care Team', value: mockCareTeam.length.toString(), sub: 'Active members', color: 'from-amber-500 to-orange-600', page: 'care-team' },
-  ];
-
-  const budgetBars = [
-    { label: 'Core Supports', used: mockParticipant.budget.coreSupports.used, total: mockParticipant.budget.coreSupports.total, color: '#8b5cf6' },
-    { label: 'Capacity Building', used: mockParticipant.budget.capacityBuilding.used, total: mockParticipant.budget.capacityBuilding.total, color: '#06b6d4' },
-    { label: 'Capital Supports', used: mockParticipant.budget.capitalSupports.used, total: mockParticipant.budget.capitalSupports.total, color: '#f97316' },
   ];
 
   return (
@@ -633,35 +640,38 @@ const DashboardPage = ({ onNavigate, onRate }: DashboardPageProps) => {
         </div>
       )}
 
-      {/* Budget + Activity */}
+      {/* Service Hours + Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-5">
         <div className="lg:col-span-2 bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-gray-100">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="text-base sm:text-lg font-bold text-gray-900" style={{ fontFamily: 'Georgia, serif' }}>NDIS Budget</h3>
-              <p className="text-xs text-gray-500">{mockParticipant.planManager}</p>
+              <h3 className="text-base sm:text-lg font-bold text-gray-900" style={{ fontFamily: 'Georgia, serif' }}>Service Hours This Month</h3>
+              <p className="text-xs text-gray-500">{mockProviderAllocation.month} · Hansonium allocation</p>
             </div>
             <button onClick={() => onNavigate('budget')} className="text-[#4ade80] hover:text-[#22c55e] font-medium text-sm flex items-center gap-1">Details <Icons.ChevronRight /></button>
           </div>
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
             <div className="flex-shrink-0">
-              <ProgressRing progress={budgetPercent} size={110} strokeWidth={10} color="#4ade80" value={`${budgetPercent}%`} label="Used" />
+              <ProgressRing progress={hoursPercent} size={110} strokeWidth={10} color="#4ade80" value={`${mockProviderAllocation.hoursUsed}h`} label="Used" />
             </div>
             <div className="flex-1 w-full space-y-3">
-              {budgetBars.map((cat) => (
-                <div key={cat.label}>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="font-medium text-gray-700">{cat.label}</span>
-                    <span className="text-gray-500 text-xs sm:text-sm">{formatCurrency(cat.used)} / {formatCurrency(cat.total)}</span>
+              {mockProviderAllocation.services.map((svc, i) => {
+                const colors = ['#8b5cf6', '#06b6d4', '#f97316'];
+                return (
+                  <div key={svc.name}>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="font-medium text-gray-700">{svc.name}</span>
+                      <span className="text-gray-500 text-xs sm:text-sm">{svc.hoursUsed}h / {svc.hoursAllocated}h</span>
+                    </div>
+                    <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                      <div className="h-full rounded-full" style={{ width: `${(svc.hoursUsed / svc.hoursAllocated) * 100}%`, backgroundColor: colors[i] }} />
+                    </div>
                   </div>
-                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                    <div className="h-full rounded-full" style={{ width: `${(cat.used / cat.total) * 100}%`, backgroundColor: cat.color }} />
-                  </div>
-                </div>
-              ))}
+                );
+              })}
               <div className="pt-3 border-t border-gray-100 flex justify-between">
                 <span className="font-semibold text-gray-900">Remaining</span>
-                <span className="text-lg sm:text-xl font-bold text-[#4ade80]">{formatCurrency(mockParticipant.budget.remaining)}</span>
+                <span className="text-lg sm:text-xl font-bold text-[#4ade80]">{mockProviderAllocation.hoursAllocated - mockProviderAllocation.hoursUsed}h</span>
               </div>
             </div>
           </div>
@@ -689,18 +699,22 @@ const DashboardPage = ({ onNavigate, onRate }: DashboardPageProps) => {
           <button onClick={() => onNavigate('goals')} className="text-[#4ade80] text-sm font-medium flex items-center gap-1">View All <Icons.ChevronRight /></button>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          {mockParticipant.goals.map((goal) => (
-            <div key={goal.id} className="bg-gray-50 rounded-lg p-3 sm:p-4">
-              <div className="flex justify-between mb-2">
-                <span className="text-xs text-gray-500 uppercase">{goal.category}</span>
-                <span className="text-sm font-bold text-[#4ade80]">{goal.progress}%</span>
+          {mockParticipant.goals.map((goal) => {
+            const done = goal.milestones.filter((m) => m.completed).length;
+            const total = goal.milestones.length;
+            return (
+              <div key={goal.id} className="bg-gray-50 rounded-lg p-3 sm:p-4">
+                <span className="text-xs text-gray-500 uppercase block mb-2">{goal.category}</span>
+                <p className="text-sm font-medium text-gray-900 mb-3 line-clamp-2">{goal.title}</p>
+                <p className="text-xs text-gray-500">{done} of {total} milestones complete</p>
+                <div className="flex gap-1 mt-2">
+                  {goal.milestones.map((m) => (
+                    <div key={m.id} className={`h-2 flex-1 rounded-full ${m.completed ? 'bg-[#4ade80]' : 'bg-gray-200'}`} />
+                  ))}
+                </div>
               </div>
-              <p className="text-sm font-medium text-gray-900 mb-3 line-clamp-2">{goal.title}</p>
-              <div className="h-2 bg-gray-200 rounded-full">
-                <div className="h-full bg-[#4ade80] rounded-full" style={{ width: `${goal.progress}%` }} />
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
@@ -831,28 +845,19 @@ const CareTeamPage = () => (
 );
 
 // ============================================
-// BUDGET PAGE
+// MY SERVICES PAGE  (provider hours — not participant NDIS budget)
 // ============================================
 const BudgetPage = () => {
-  const { budget } = mockParticipant;
+  const alloc = mockProviderAllocation;
+  const hoursRemaining = alloc.hoursAllocated - alloc.hoursUsed;
+  const hoursPercent = Math.round((alloc.hoursUsed / alloc.hoursAllocated) * 100);
+  const colors = ['#8b5cf6', '#06b6d4', '#f97316'];
 
   const summaryStats = [
-    { label: 'Total Budget', value: formatCurrency(budget.total), color: 'text-gray-900' },
-    { label: 'Used', value: formatCurrency(budget.used), color: 'text-amber-600' },
-    { label: 'Remaining', value: formatCurrency(budget.remaining), color: 'text-[#4ade80]' },
-    { label: 'Plan Days', value: getDaysRemaining(mockParticipant.planEndDate).toString(), color: 'text-purple-600' },
-  ];
-
-  const categoryRings = [
-    { name: 'Core Supports', data: budget.coreSupports, color: '#8b5cf6', desc: 'Most flexible' },
-    { name: 'Capacity Building', data: budget.capacityBuilding, color: '#06b6d4', desc: 'Skills & therapy' },
-    { name: 'Capital Supports', data: budget.capitalSupports, color: '#f97316', desc: 'Equipment & mods' },
-  ];
-
-  const sections = [
-    { title: 'Core Supports', data: budget.coreSupports, color: '#8b5cf6', flex: true },
-    { title: 'Capacity Building', data: budget.capacityBuilding, color: '#06b6d4', flex: false },
-    { title: 'Capital Supports', data: budget.capitalSupports, color: '#f97316', flex: false },
+    { label: 'Hours This Month', value: `${alloc.hoursAllocated}h`, color: 'text-gray-900' },
+    { label: 'Used', value: `${alloc.hoursUsed}h`, color: 'text-amber-600' },
+    { label: 'Remaining', value: `${hoursRemaining}h`, color: 'text-[#4ade80]' },
+    { label: 'Scheduled', value: `${alloc.hoursScheduled}h`, color: 'text-blue-600' },
   ];
 
   return (
@@ -867,64 +872,58 @@ const BudgetPage = () => {
       </div>
 
       <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-100">
-        <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-5 sm:mb-6" style={{ fontFamily: 'Georgia, serif' }}>Budget by Category</h3>
-        <div className="flex flex-wrap justify-around gap-4 sm:gap-0">
-          {categoryRings.map((cat) => (
-            <div key={cat.name} className="text-center">
-              <ProgressRing
-                progress={(cat.data.used / cat.data.total) * 100}
-                size={100}
-                strokeWidth={9}
-                color={cat.color}
-                value={`${Math.round((cat.data.used / cat.data.total) * 100)}%`}
-                label="Used"
-              />
-              <h4 className="font-semibold text-gray-900 mt-2 text-sm">{cat.name}</h4>
-              <p className="text-xs text-gray-500">{cat.desc}</p>
-              <p className="text-sm mt-1"><span className="font-medium">{formatCurrency(cat.data.remaining)}</span> <span className="text-gray-400">left</span></p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {sections.map((section) => (
-        <div key={section.title} className="bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-gray-100">
-          <div className="flex flex-wrap justify-between items-start gap-2 mb-4">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: section.color }} />
-              <h3 className="text-base sm:text-lg font-bold text-gray-900" style={{ fontFamily: 'Georgia, serif' }}>{section.title}</h3>
-              {section.flex && <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">Flexible</span>}
-            </div>
-            <div className="text-right">
-              <p className="font-bold text-gray-900">{formatCurrency(section.data.remaining)}</p>
-              <p className="text-xs text-gray-500">of {formatCurrency(section.data.total)}</p>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8">
+          <div className="flex-shrink-0 flex justify-center">
+            <div className="text-center">
+              <ProgressRing progress={hoursPercent} size={120} strokeWidth={10} color="#4ade80" value={`${alloc.hoursUsed}h`} label="Used" />
+              <p className="text-sm font-medium text-gray-700 mt-2">{alloc.month}</p>
+              <p className="text-xs text-gray-400">Hansonium services</p>
             </div>
           </div>
-          <div className="space-y-2">
-            {section.data.categories.map((cat: BudgetCategory) => (
-              <div key={cat.name} className="flex flex-col sm:flex-row sm:items-center gap-2 p-3 bg-gray-50 rounded-lg">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <p className="font-medium text-gray-900 text-sm">{cat.name}</p>
-                    {cat.stated && <span className="px-1.5 py-0.5 bg-amber-100 text-amber-700 text-[10px] rounded">Stated</span>}
-                  </div>
-                  <p className="text-xs text-gray-500">{cat.description}</p>
+          <div className="flex-1 space-y-4">
+            {alloc.services.map((svc, i) => (
+              <div key={svc.name}>
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="font-medium text-gray-800">{svc.name}</span>
+                  <span className="text-gray-500">{svc.hoursUsed}h <span className="text-gray-300">/</span> {svc.hoursAllocated}h</span>
                 </div>
-                <div className="sm:w-28">
-                  <div className="flex justify-between text-xs text-gray-500 mb-1">
-                    <span>{formatCurrency(cat.used)}</span>
-                    <span>{formatCurrency(cat.allocated)}</span>
-                  </div>
-                  <div className="h-2 bg-gray-200 rounded-full">
-                    <div className="h-full rounded-full" style={{ width: `${(cat.used / cat.allocated) * 100}%`, backgroundColor: section.color }} />
-                  </div>
+                <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="h-full rounded-full transition-all" style={{ width: `${(svc.hoursUsed / svc.hoursAllocated) * 100}%`, backgroundColor: colors[i] }} />
                 </div>
-                <p className="sm:w-20 sm:text-right font-medium text-gray-900 text-sm">{formatCurrency(cat.allocated - cat.used)}</p>
+                <p className="text-xs text-gray-400 mt-1">{svc.hoursAllocated - svc.hoursUsed}h remaining</p>
               </div>
             ))}
           </div>
         </div>
-      ))}
+      </div>
+
+      <div className="bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-gray-100">
+        <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-4" style={{ fontFamily: 'Georgia, serif' }}>Recent Service Claims</h3>
+        <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+          <table className="w-full text-sm min-w-[480px]">
+            <thead>
+              <tr className="text-left text-xs text-gray-500 uppercase border-b">
+                <th className="pb-3">Date</th>
+                <th className="pb-3">Service</th>
+                <th className="pb-3 hidden sm:table-cell">Worker</th>
+                <th className="pb-3 text-right">Amount</th>
+                <th className="pb-3 text-right">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {mockClaims.map((claim) => (
+                <tr key={claim.id} className="border-b border-gray-50">
+                  <td className="py-3 text-gray-600 whitespace-nowrap">{formatDate(claim.date)}</td>
+                  <td className="py-3 font-medium text-gray-900">{claim.service}</td>
+                  <td className="py-3 text-gray-600 hidden sm:table-cell">{claim.provider}</td>
+                  <td className="py-3 text-right font-medium whitespace-nowrap">{formatCurrencyFull(claim.amount)}</td>
+                  <td className="py-3 text-right"><StatusBadge status={claim.status} size="sm" /></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 };
@@ -934,25 +933,37 @@ const BudgetPage = () => {
 // ============================================
 const GoalsPage = () => (
   <div className="p-4 sm:p-6">
+    <p className="text-sm text-gray-500 mb-4">Milestones are defined by your support coordinator. Contact your coordinator to update or add milestones.</p>
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
-      {mockParticipant.goals.map((goal) => (
-        <div key={goal.id} className="bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-gray-100">
-          <div className="flex justify-between items-start mb-4">
-            <div className="flex-1 pr-3">
-              <span className="text-xs font-medium text-gray-500 uppercase">{goal.category}</span>
-              <h4 className="text-base sm:text-lg font-bold text-gray-900 mt-1">{goal.title}</h4>
+      {mockParticipant.goals.map((goal) => {
+        const done = goal.milestones.filter((m) => m.completed).length;
+        const total = goal.milestones.length;
+        return (
+          <div key={goal.id} className="bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-gray-100">
+            <div className="flex items-start justify-between mb-3">
+              <div className="flex-1 pr-3">
+                <span className="text-xs font-medium text-gray-500 uppercase">{goal.category}</span>
+                <h4 className="text-base sm:text-lg font-bold text-gray-900 mt-1">{goal.title}</h4>
+              </div>
+              <span className="flex-shrink-0 text-sm font-semibold text-gray-500 whitespace-nowrap">{done}/{total} done</span>
             </div>
-            <div className="text-right flex-shrink-0">
-              <span className="text-xl sm:text-2xl font-bold text-[#4ade80]">{goal.progress}%</span>
-              <p className="text-xs text-gray-500">Progress</p>
-            </div>
+            <ul className="space-y-2">
+              {goal.milestones.map((m) => (
+                <li key={m.id} className="flex items-start gap-3">
+                  <span className={`mt-0.5 w-5 h-5 flex-shrink-0 rounded-full border-2 flex items-center justify-center ${m.completed ? 'bg-[#4ade80] border-[#4ade80]' : 'border-gray-300'}`}>
+                    {m.completed && (
+                      <svg viewBox="0 0 12 12" fill="none" className="w-3 h-3">
+                        <path d="M2 6l3 3 5-5" stroke="#1a1a2e" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    )}
+                  </span>
+                  <span className={`text-sm leading-snug ${m.completed ? 'text-gray-400 line-through' : 'text-gray-700'}`}>{m.label}</span>
+                </li>
+              ))}
+            </ul>
           </div>
-          <div className="h-3 bg-gray-100 rounded-full mb-4">
-            <div className="h-full bg-[#4ade80] rounded-full" style={{ width: `${goal.progress}%` }} />
-          </div>
-          <div className="flex items-center gap-2 text-sm text-gray-500"><Icons.TrendingUp /><span>On track</span></div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   </div>
 );
@@ -1072,7 +1083,7 @@ const BottomNav = ({ currentPage, onNavigate }: BottomNavProps) => {
   const items = [
     { id: 'dashboard', label: 'Home', icon: Icons.Home },
     { id: 'visits', label: 'Visits', icon: Icons.Calendar },
-    { id: 'budget', label: 'Budget', icon: Icons.Wallet },
+    { id: 'budget', label: 'Services', icon: Icons.Wallet },
     { id: 'care-team', label: 'Team', icon: Icons.Users },
     { id: 'messages', label: 'Messages', icon: Icons.MessageCircle, badge: mockMessages.filter((m) => !m.isRead).length },
   ];
@@ -1111,7 +1122,7 @@ export default function FamilyPortal() {
     dashboard: { title: `Good ${greeting}, ${mockParticipant.preferredName}` },
     visits: { title: 'Visits & Schedule', subtitle: 'Manage your care visits' },
     'care-team': { title: 'Your Care Team', subtitle: 'Connect with your support workers' },
-    budget: { title: 'NDIS Budget', subtitle: 'Track your plan funding' },
+    budget: { title: 'My Services', subtitle: 'Hours used with Hansonium this month' },
     goals: { title: 'My Goals', subtitle: 'Track your NDIS goals' },
     documents: { title: 'Documents', subtitle: 'Plans, reports & statements' },
     messages: { title: 'Messages', subtitle: `${mockMessages.filter((m) => !m.isRead).length} unread` },
