@@ -414,6 +414,8 @@ All portals use a **consistent stack**:
 | Icons | Inline SVG (no external dependency) |
 | Deployment | Vercel (recommended) |
 
+> **Note:** The Family Portal currently uses Next.js 14 / React 18 / Tailwind CSS 3. All other portals use Next.js 16 / React 19 / Tailwind CSS 4. Standardizing the family portal to Next.js 16 is a future migration step.
+
 ### Design Tokens (consistent across all portals)
 
 ```css
