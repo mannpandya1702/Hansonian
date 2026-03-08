@@ -29,7 +29,7 @@ const ROLE_META = {
   },
   employee: {
     label: "Employee",
-    description: "Rostering, compliance vault & DEX audit lab",
+    description: "Rostering, compliance vault & session review",
     badgeCls: "bg-[#1a1a2e]/10 text-[#1a1a2e] border border-[#1a1a2e]/20",
   },
   family: {
