@@ -40,30 +40,30 @@ const dexChartData = [
 const alertsData = [
   {
     id: 1,
-    title: "High-Risk Incident – Zone 4",
+    title: "Missed Medication Support – Zone 4",
     severity: "high",
     zone: "Zone 4",
     description:
-      "Medication non-compliance reported in 3 consecutive sessions.",
-    trend: "-12% wellness drop",
+      "Medication support not delivered in 3 consecutive sessions. Incident report filed.",
+    trend: "3 consecutive missed sessions",
   },
   {
     id: 2,
-    title: "Staff Burnout Risk – Zone 2",
+    title: "Overtime Threshold Exceeded – Zone 2",
     severity: "medium",
     zone: "Zone 2",
     description:
-      "Overtime hours exceeded threshold for 4 staff members this month.",
-    trend: "+18% workload increase",
+      "4 staff members have exceeded contracted hours this month. Review rostering.",
+    trend: "+18% hours above contracted",
   },
   {
     id: 3,
-    title: "Compliance Gap – Zone 1",
+    title: "DEX Documentation Gap – Zone 1",
     severity: "low",
     zone: "Zone 1",
     description:
-      "8 sessions missing mandatory progress documentation.",
-    trend: "DEX risk +6%",
+      "8 sessions missing mandatory SCORE documentation before DEX submission deadline.",
+    trend: "8 sessions at risk",
   },
 ]
 
@@ -226,17 +226,17 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             <InsightCard
               title="Revenue Forecast"
-              description="Projected 8% revenue growth next quarter based on current trend velocity."
+              description="Projected 8% revenue growth next quarter based on current service delivery hours vs plan hours trend."
               impact="Positive"
             />
             <InsightCard
-              title="Compliance Risk Alert"
-              description="If missing session documentation exceeds 25, DEX score may drop below 4.0."
+              title="DEX Submission Risk"
+              description="8 sessions missing SCORE documentation. If unresolved before deadline, DEX compliance rate drops to 91%."
               impact="Warning"
             />
             <InsightCard
-              title="Labor Cost Optimization"
-              description="Reducing overtime in Zone 2 could improve net margin by 2.4%."
+              title="Shift Attendance Rate"
+              description="Missed shift rate in Zone 2 is 4.2% this month — above the 3% threshold. Review rostering and staff availability."
               impact="Action Required"
             />
           </div>

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Tooltip from "./tooltip";
 
 type Session = {
   id: number;
@@ -10,14 +9,17 @@ type Session = {
   date: string;
   service: string;
   hours: number;
-  mapped: boolean;
+  scoreCircumstances: string;
+  scoreGoals: string;
+  scoreSatisfaction: number;
+  readyToSubmit: boolean;
   status: "Pending" | "Approved" | "Flagged";
   approvedBy?: string;
   approvedAt?: string;
-  mappingError?: string;
+  issueNote?: string;
 };
 
-export default function DexAuditLab() {
+export default function SessionReview() {
   const [sessions, setSessions] = useState<Session[]>([
     {
       id: 1,
@@ -26,7 +28,10 @@ export default function DexAuditLab() {
       date: "2026-02-20",
       service: "Physiotherapy",
       hours: 4,
-      mapped: true,
+      scoreCircumstances: "Stable living, carer support in place",
+      scoreGoals: "Working toward independent mobility",
+      scoreSatisfaction: 4,
+      readyToSubmit: true,
       status: "Pending",
     },
     {
@@ -36,7 +41,10 @@ export default function DexAuditLab() {
       date: "2026-02-19",
       service: "Occupational Therapy",
       hours: 3,
-      mapped: true,
+      scoreCircumstances: "Recent move, adjusting to new environment",
+      scoreGoals: "Improving daily living skills",
+      scoreSatisfaction: 5,
+      readyToSubmit: true,
       status: "Pending",
     },
     {
@@ -46,89 +54,125 @@ export default function DexAuditLab() {
       date: "2026-02-18",
       service: "Personal Care",
       hours: 2,
-      mapped: false,
+      scoreCircumstances: "",
+      scoreGoals: "",
+      scoreSatisfaction: 0,
+      readyToSubmit: false,
       status: "Flagged",
-      mappingError: "Missing staff ID in XML schema",
+      issueNote: "Staff ID missing — contact your coordinator to resolve before this session can be submitted.",
     },
   ]);
 
   const [selected, setSelected] = useState<number[]>([]);
   const [filter, setFilter] = useState<"All" | "Pending" | "Approved" | "Flagged">("All");
+  const [expanded, setExpanded] = useState<number | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const toggleSelect = (id: number) => {
     setSelected((prev) =>
-      prev.includes(id)
-        ? prev.filter((item) => item !== id)
-        : [...prev, id]
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
     );
   };
 
-  const handleBatchApprove = () => {
+  const handleApprove = () => {
     const updated = sessions.map((session) =>
-      selected.includes(session.id) && session.mapped
+      selected.includes(session.id) && session.readyToSubmit
         ? {
             ...session,
-            status: "Approved",
+            status: "Approved" as const,
             approvedBy: "Admin User",
             approvedAt: new Date().toLocaleString(),
           }
         : session
     );
-    setSessions(updated as Session[]);
+    setSessions(updated);
     setSelected([]);
-  };
-
-  const getStatusStyle = (status: string) => {
-    switch (status) {
-      case "Approved":
-        return "bg-green-50 text-green-700";
-      case "Flagged":
-        return "bg-red-50 text-red-600";
-      default:
-        return "bg-yellow-50 text-yellow-700";
-    }
+    setConfirmOpen(false);
   };
 
   const filteredSessions =
     filter === "All" ? sessions : sessions.filter((s) => s.status === filter);
 
+  const selectedReadyCount = selected.filter(
+    (id) => sessions.find((s) => s.id === id)?.readyToSubmit
+  ).length;
+
   return (
-    <div className="px-4 sm:px-6 md:px-10 py-8 max-w-7xl mx-auto bg-slate-50 min-h-screen space-y-10">
+    <div className="px-4 sm:px-6 md:px-10 py-8 max-w-5xl mx-auto bg-[#faf9f7] min-h-screen space-y-6">
 
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-6">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
-            DEX Audit Lab
+          <h1 className="text-2xl sm:text-3xl font-semibold text-[#1a1a2e]">
+            Session Review
           </h1>
-          <p className="text-slate-500 font-medium">
-            Review & batch approve agent-mapped session data
+          <p className="text-sm text-[#4a4a6a] mt-1">
+            Review completed sessions and approve them for DEX submission. The technical formatting happens automatically in the background.
           </p>
         </div>
 
         <button
-          onClick={handleBatchApprove}
-          disabled={selected.length === 0}
-          className={`px-6 py-3 rounded-xl font-semibold transition ${
-            selected.length === 0
-              ? "bg-slate-200 text-slate-400 cursor-not-allowed"
-              : "bg-slate-900 text-white hover:bg-slate-800"
+          onClick={() => selectedReadyCount > 0 && setConfirmOpen(true)}
+          disabled={selectedReadyCount === 0}
+          className={`px-5 py-2.5 rounded-xl font-semibold text-sm transition whitespace-nowrap ${
+            selectedReadyCount === 0
+              ? "bg-[#e8e4dd] text-[#4a4a6a] cursor-not-allowed"
+              : "bg-[#1a1a2e] text-white hover:bg-[#252540]"
           }`}
         >
-          Batch Approve ({selected.length})
+          Approve {selectedReadyCount > 0 ? `${selectedReadyCount} Session${selectedReadyCount > 1 ? "s" : ""}` : "Selected"}
         </button>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-wrap gap-3">
-        {["All", "Pending", "Approved", "Flagged"].map((f) => (
+      {/* Confirm Modal */}
+      {confirmOpen && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl">
+            <h2 className="text-lg font-semibold text-[#1a1a2e] mb-2">Confirm Submission</h2>
+            <p className="text-sm text-[#4a4a6a] mb-4">
+              You are approving <strong>{selectedReadyCount}</strong> session{selectedReadyCount > 1 ? "s" : ""} for DEX submission.
+              Once approved, these sessions will be sent to the government data exchange automatically.
+            </p>
+            <ul className="mb-5 space-y-1">
+              {selected.map((id) => {
+                const s = sessions.find((s) => s.id === id);
+                if (!s || !s.readyToSubmit) return null;
+                return (
+                  <li key={id} className="text-sm text-[#1a1a2e] flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#4ade80] flex-shrink-0" />
+                    {s.participant} · {s.service} · {s.date}
+                  </li>
+                );
+              })}
+            </ul>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setConfirmOpen(false)}
+                className="flex-1 py-2.5 border border-[#e8e4dd] text-[#4a4a6a] font-medium rounded-xl hover:bg-[#faf9f7]"
+              >
+                Go Back
+              </button>
+              <button
+                onClick={handleApprove}
+                className="flex-1 py-2.5 bg-[#1a1a2e] text-white font-semibold rounded-xl hover:bg-[#252540]"
+              >
+                Confirm &amp; Approve
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Filter tabs */}
+      <div className="flex flex-wrap gap-2">
+        {(["All", "Pending", "Approved", "Flagged"] as const).map((f) => (
           <button
             key={f}
-            onClick={() => setFilter(f as any)}
+            onClick={() => setFilter(f)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
               filter === f
-                ? "bg-slate-900 text-white"
-                : "bg-white border border-slate-200 text-slate-700 hover:bg-slate-100"
+                ? "bg-[#1a1a2e] text-white"
+                : "bg-white border border-[#e8e4dd] text-[#4a4a6a] hover:bg-[#f0ede6]"
             }`}
           >
             {f}
@@ -136,92 +180,106 @@ export default function DexAuditLab() {
         ))}
       </div>
 
-      {/* Table Wrapper */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-x-auto">
-        <table className="min-w-[900px] w-full text-left">
-          <thead className="text-slate-400 text-[11px] font-bold uppercase tracking-wider border-b border-slate-200">
-            <tr>
-              <th className="px-6 py-4"></th>
-              <th className="px-6 py-4">Participant</th>
-              <th className="px-6 py-4">Staff</th>
-              <th className="px-6 py-4 text-center">Date</th>
-              <th className="px-6 py-4 text-center">Service</th>
-              <th className="px-6 py-4 text-center">Hours</th>
-              <th className="px-6 py-4 text-center">Schema Mapping</th>
-              <th className="px-6 py-4 text-center">Status</th>
-              <th className="px-6 py-4 text-center">Audit</th>
-            </tr>
-          </thead>
+      {/* Session list */}
+      <div className="space-y-3">
+        {filteredSessions.map((session) => {
+          const isExpanded = expanded === session.id;
+          const statusStyle =
+            session.status === "Approved"
+              ? "bg-[#4ade80]/15 text-[#16a34a] border border-[#4ade80]/30"
+              : session.status === "Flagged"
+              ? "bg-red-50 text-red-600 border border-red-200"
+              : "bg-yellow-50 text-yellow-700 border border-yellow-200";
 
-          <tbody className="divide-y divide-slate-100">
-            {filteredSessions.map((session) => (
-              <tr
-                key={session.id}
-                className="hover:bg-slate-50 transition"
-              >
-                <td className="px-6 py-4">
-                  <input
-                    type="checkbox"
-                    checked={selected.includes(session.id)}
-                    onChange={() => toggleSelect(session.id)}
-                    disabled={!session.mapped}
-                    className="w-4 h-4 accent-slate-900"
-                  />
-                </td>
+          return (
+            <div
+              key={session.id}
+              className="bg-white rounded-2xl border border-[#e8e4dd] overflow-hidden"
+            >
+              {/* Row summary */}
+              <div className="flex items-center gap-4 p-4 sm:p-5">
+                <input
+                  type="checkbox"
+                  checked={selected.includes(session.id)}
+                  onChange={() => toggleSelect(session.id)}
+                  disabled={!session.readyToSubmit || session.status === "Approved"}
+                  className="w-4 h-4 accent-[#1a1a2e] flex-shrink-0"
+                />
 
-                <td className="px-6 py-4 font-semibold text-slate-900">
-                  {session.participant}
-                </td>
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                    <span className="font-semibold text-[#1a1a2e]">{session.participant}</span>
+                    <span className="text-sm text-[#4a4a6a]">{session.service}</span>
+                    <span className="text-sm text-[#4a4a6a]">·</span>
+                    <span className="text-sm text-[#4a4a6a]">{session.staff}</span>
+                  </div>
+                  <p className="text-xs text-[#4a4a6a] mt-0.5">{session.date} · {session.hours}h</p>
+                </div>
 
-                <td className="px-6 py-4 text-slate-600">
-                  {session.staff}
-                </td>
+                <div className="flex items-center gap-3 flex-shrink-0">
+                  {/* Ready indicator */}
+                  <span className={`hidden sm:inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full ${
+                    session.readyToSubmit
+                      ? "bg-[#4ade80]/15 text-[#16a34a]"
+                      : "bg-amber-50 text-amber-700"
+                  }`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${session.readyToSubmit ? "bg-[#4ade80]" : "bg-amber-500"}`} />
+                    {session.readyToSubmit ? "Ready" : "Needs attention"}
+                  </span>
 
-                <td className="px-6 py-4 text-center text-slate-700">
-                  {session.date}
-                </td>
-
-                <td className="px-6 py-4 text-center text-slate-700">
-                  {session.service}
-                </td>
-
-                <td className="px-6 py-4 text-center font-medium text-slate-800">
-                  {session.hours}h
-                </td>
-
-                <td className="px-6 py-4 text-center">
-                  {session.mapped ? (
-                    <span className="text-green-700 font-medium text-xs">
-                      Valid XML
-                    </span>
-                  ) : (
-                    <Tooltip content={session.mappingError || "Mapping Error"}>
-                      <span className="text-red-600 font-medium text-xs cursor-help">
-                        Mapping Error
-                      </span>
-                    </Tooltip>
-                  )}
-                </td>
-
-                <td className="px-6 py-4 text-center">
-                  <span
-                    className={`px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-wide ${getStatusStyle(
-                      session.status
-                    )}`}
-                  >
+                  <span className={`text-[10px] font-bold uppercase tracking-wide px-3 py-1 rounded-full ${statusStyle}`}>
                     {session.status}
                   </span>
-                </td>
 
-                <td className="px-6 py-4 text-center text-slate-500 text-xs">
-                  {session.status === "Approved"
-                    ? `${session.approvedBy} @ ${session.approvedAt}`
-                    : "-"}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                  <button
+                    onClick={() => setExpanded(isExpanded ? null : session.id)}
+                    className="text-[#4a4a6a] hover:text-[#1a1a2e] transition"
+                    aria-label={isExpanded ? "Collapse" : "Expand"}
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      {isExpanded
+                        ? <path d="m18 15-6-6-6 6" />
+                        : <path d="m6 9 6 6 6-6" />}
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              {/* Expanded detail */}
+              {isExpanded && (
+                <div className="border-t border-[#e8e4dd] px-4 sm:px-5 py-4 bg-[#faf9f7] space-y-3">
+                  {session.issueNote && (
+                    <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800">
+                      <svg className="flex-shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                      {session.issueNote}
+                    </div>
+                  )}
+                  {session.readyToSubmit && (
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div className="bg-white rounded-xl p-3 border border-[#e8e4dd]">
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-[#4a4a6a] mb-1">Circumstances</p>
+                        <p className="text-sm text-[#1a1a2e]">{session.scoreCircumstances}</p>
+                      </div>
+                      <div className="bg-white rounded-xl p-3 border border-[#e8e4dd]">
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-[#4a4a6a] mb-1">Goals</p>
+                        <p className="text-sm text-[#1a1a2e]">{session.scoreGoals}</p>
+                      </div>
+                      <div className="bg-white rounded-xl p-3 border border-[#e8e4dd]">
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-[#4a4a6a] mb-1">Satisfaction Rating</p>
+                        <p className="text-sm text-[#1a1a2e]">{session.scoreSatisfaction}/5</p>
+                      </div>
+                    </div>
+                  )}
+                  {session.status === "Approved" && (
+                    <p className="text-xs text-[#4a4a6a]">
+                      Approved by <strong>{session.approvedBy}</strong> at {session.approvedAt}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
