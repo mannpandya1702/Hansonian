@@ -45,7 +45,7 @@ const NAV_ITEMS = [
   { name: "Dashboard",          path: "/dashboard",  icon: HomeIcon,      description: "Workforce overview" },
   { name: "Agentic Rostering",  path: "/rostering",  icon: CalendarIcon,  description: "US.E1 — Auto-fill roster" },
   { name: "Compliance Vault",   path: "/compliance", icon: ShieldIcon,    description: "US.E2 — Credential expiry" },
-  { name: "DEX Audit Lab",      path: "/dex-audit",  icon: ClipboardIcon, description: "US.E3 — Batch approve" },
+  { name: "Session Review",      path: "/dex-audit",  icon: ClipboardIcon, description: "US.E3 — Approve sessions" },
   { name: "Staff Directory",    path: "/staff",      icon: UsersIcon,     description: "Employee registry" },
 ];
 
