@@ -407,10 +407,10 @@ const Sidebar = ({ currentPage, onNavigate, isOpen, onClose }: SidebarProps) => 
       <aside className={`fixed left-0 top-0 z-50 h-screen w-60 bg-[#1a1a2e] text-white flex flex-col transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
         {/* Logo */}
         <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-[#4ade80] flex items-center justify-center text-[#1a1a2e]"><Icons.Heart /></div>
-            <div>
-              <h1 className="text-base font-bold" style={{ fontFamily: 'Georgia, serif' }}>Hansonium</h1>
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-8 h-8 shrink-0 rounded-lg bg-[#4ade80] flex items-center justify-center text-[#1a1a2e]"><Icons.Heart /></div>
+            <div className="min-w-0">
+              <h1 className="text-base font-bold truncate" style={{ fontFamily: 'Georgia, serif' }}>Hansonium</h1>
               <p className="text-[10px] text-white/50">Family Portal</p>
             </div>
           </div>
