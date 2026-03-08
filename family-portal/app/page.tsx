@@ -410,7 +410,7 @@ const Sidebar = ({ currentPage, onNavigate, isOpen, onClose }: SidebarProps) => 
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="w-8 h-8 shrink-0 rounded-lg bg-[#4ade80] flex items-center justify-center text-[#1a1a2e]"><Icons.Heart /></div>
             <div className="min-w-0">
-              <h1 className="text-sm font-bold" style={{ fontFamily: 'Georgia, serif' }}>Hansonium</h1>
+              <div className="text-sm font-bold leading-tight" style={{ fontFamily: 'Georgia, serif' }}>Hansonium</div>
               <p className="text-[10px] text-white/50">Family Portal</p>
             </div>
           </div>
