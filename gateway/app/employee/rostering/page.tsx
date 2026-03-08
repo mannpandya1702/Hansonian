@@ -19,13 +19,17 @@ export default function AgenticRoster() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All");
   const [notification, setNotification] = useState("");
-  const [manual, setManual] = useState({ agentId: 0, lat: "", lng: "", unit: "" });
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [advancedLat, setAdvancedLat] = useState("");
+  const [advancedLng, setAdvancedLng] = useState("");
+  const [selectedUnit, setSelectedUnit] = useState("");
+  const [pendingAssignment, setPendingAssignment] = useState<{ agent: Agent; note: string } | null>(null);
 
   const [agents, setAgents] = useState<Agent[]>([
-    { id: 1, name: "Sarah Jenkins", role: "Field Support Agent", unit: "Care", email: "sarah@company.com", status: "On Duty", location: { lat: 28.6139, lng: 77.2090 } },
-    { id: 2, name: "Mike Ross", role: "Senior Field Agent", unit: "Care", email: "mike@company.com", status: "On Duty", location: { lat: 28.7041, lng: 77.1025 } },
-    { id: 3, name: "Jessica Pearson", role: "Case Response Manager", unit: "Management", email: "jessica@company.com", status: "Off Duty", location: { lat: 28.5355, lng: 77.3910 } },
-    { id: 4, name: "Harvey Specter", role: "Operations Compliance Agent", unit: "Operations", email: "harvey@company.com", status: "On Duty", location: { lat: 28.4595, lng: 77.0266 } },
+    { id: 1, name: "Sarah Jenkins", role: "Field Support Agent", unit: "Care", email: "sarah@company.com", status: "On Duty", location: { lat: -37.8136, lng: 144.9631 } },
+    { id: 2, name: "Mike Ross", role: "Senior Field Agent", unit: "Care", email: "mike@company.com", status: "On Duty", location: { lat: -37.8200, lng: 144.9550 } },
+    { id: 3, name: "Jessica Pearson", role: "Case Response Manager", unit: "Management", email: "jessica@company.com", status: "Off Duty", location: { lat: -37.8000, lng: 144.9700 } },
+    { id: 4, name: "Harvey Specter", role: "Operations Compliance Agent", unit: "Operations", email: "harvey@company.com", status: "On Duty", location: { lat: -37.8300, lng: 144.9800 } },
   ]);
 
   useEffect(() => {
@@ -51,14 +55,6 @@ export default function AgenticRoster() {
     }
   };
 
-  const filteredAgents = agents.filter(agent => {
-    const matchesSearch =
-      agent.name.toLowerCase().includes(search.toLowerCase()) ||
-      agent.role.toLowerCase().includes(search.toLowerCase());
-    const matchesFilter = filter === "All" || agent.unit.toLowerCase() === filter.toLowerCase();
-    return matchesSearch && matchesFilter;
-  });
-
   const getDistance = (lat1: number, lng1: number, lat2: number, lng2: number) => {
     const R = 6371;
     const dLat = ((lat2 - lat1) * Math.PI) / 180;
@@ -67,80 +63,152 @@ export default function AgenticRoster() {
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   };
 
-  const handleAutoAssign = (targetLat?: number, targetLng?: number, unit?: string) => {
+  const handleAutoAssignRequest = () => {
     let candidates = agents.filter(a => a.status === "On Duty");
-    if (unit) candidates = candidates.filter(a => a.unit.toLowerCase() === unit.toLowerCase());
-    if (!candidates.length) return setNotification("No available agents match criteria!");
+    if (selectedUnit) candidates = candidates.filter(a => a.unit === selectedUnit);
+    if (!candidates.length) {
+      setNotification("No available staff match the selected criteria.");
+      setTimeout(() => setNotification(""), 4000);
+      return;
+    }
 
     let selected: Agent;
-    if (targetLat !== undefined && targetLng !== undefined) {
-      selected = candidates.reduce((prev, curr) => {
-        const prevDist = getDistance(prev.location.lat, prev.location.lng, targetLat, targetLng);
-        const currDist = getDistance(curr.location.lat, curr.location.lng, targetLat, targetLng);
-        return currDist < prevDist ? curr : prev;
-      });
-      setAgents(prev => prev.map(a => a.id === selected.id ? { ...a, location: { lat: targetLat, lng: targetLng } } : a));
+    if (showAdvanced && advancedLat && advancedLng) {
+      const lat = Number(advancedLat);
+      const lng = Number(advancedLng);
+      selected = candidates.reduce((prev, curr) =>
+        getDistance(curr.location.lat, curr.location.lng, lat, lng) <
+        getDistance(prev.location.lat, prev.location.lng, lat, lng) ? curr : prev
+      );
     } else {
       selected = candidates[0];
     }
-    setNotification(`Assigned ${selected.name}`);
-    setTimeout(() => setNotification(""), 4000);
+
+    const note = showAdvanced && advancedLat && advancedLng
+      ? `Nearest to coordinates (${Number(advancedLat).toFixed(4)}, ${Number(advancedLng).toFixed(4)})`
+      : selectedUnit ? `First available in ${selectedUnit} unit` : "First available agent";
+
+    setPendingAssignment({ agent: selected, note });
   };
 
-  const handleManualAssign = () => {
-    const { agentId, lat, lng, unit } = manual;
-    if (!agentId) return setNotification("Select an agent");
+  const confirmAssignment = () => {
+    if (!pendingAssignment) return;
+    const { agent } = pendingAssignment;
     setAgents(prev =>
       prev.map(a =>
-        a.id === Number(agentId)
-          ? { ...a, location: lat && lng ? { lat: Number(lat), lng: Number(lng) } : a.location, unit: unit || a.unit }
+        a.id === agent.id && showAdvanced && advancedLat && advancedLng
+          ? { ...a, location: { lat: Number(advancedLat), lng: Number(advancedLng) } }
           : a
       )
     );
-    setNotification("Manually assigned agent successfully");
+    setNotification(`${agent.name} has been assigned.`);
     setTimeout(() => setNotification(""), 4000);
+    setPendingAssignment(null);
   };
 
+  const filteredAgents = agents.filter(agent => {
+    const matchesSearch =
+      agent.name.toLowerCase().includes(search.toLowerCase()) ||
+      agent.role.toLowerCase().includes(search.toLowerCase());
+    const matchesFilter = filter === "All" || agent.unit === filter;
+    return matchesSearch && matchesFilter;
+  });
+
   return (
-    <div className="p-4 md:p-8 xl:p-12 max-w-7xl mx-auto bg-[#f6f4ef] min-h-screen space-y-10">
-      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2">
-        <h1 className="text-3xl md:text-4xl font-black text-slate-800 tracking-tight">Agentic Rostering</h1>
-        <p className="text-slate-500 font-medium">Live deployment & dynamic assignment</p>
+    <div className="p-4 md:p-8 max-w-7xl mx-auto bg-[#faf9f7] min-h-screen space-y-6">
+
+      <div>
+        <h1 className="text-2xl sm:text-3xl font-semibold text-[#1a1a2e]">Rostering</h1>
+        <p className="text-sm text-[#4a4a6a] mt-1">View your team and assign staff to sessions.</p>
       </div>
 
       {notification && (
-        <div className="bg-slate-200 text-slate-700 px-6 py-3 rounded-xl font-semibold shadow-sm transition">
+        <div className="bg-[#4ade80]/15 border border-[#4ade80]/30 text-[#16a34a] px-5 py-3 rounded-xl text-sm font-medium">
           {notification}
         </div>
       )}
 
-      <div className="bg-white p-6 rounded-2xl shadow-sm border space-y-6">
-        <h2 className="font-bold text-lg text-slate-700">Assign Agent</h2>
-        <div className="flex flex-col md:flex-row gap-4 md:items-end">
-          <input type="text" placeholder="Target Lat (optional)" className="px-4 py-2 border rounded-lg w-full" onChange={e => setManual({ ...manual, lat: e.target.value })} value={manual.lat} />
-          <input type="text" placeholder="Target Lng (optional)" className="px-4 py-2 border rounded-lg w-full" onChange={e => setManual({ ...manual, lng: e.target.value })} value={manual.lng} />
-          <input type="text" placeholder="Unit (optional)" className="px-4 py-2 border rounded-lg w-full" onChange={e => setManual({ ...manual, unit: e.target.value })} value={manual.unit} />
-          <button
-            className="px-4 py-2 bg-slate-700 text-white rounded-lg font-semibold hover:bg-slate-800 transition w-full md:w-auto"
-            onClick={() => handleAutoAssign(manual.lat ? Number(manual.lat) : undefined, manual.lng ? Number(manual.lng) : undefined, manual.unit || undefined)}
-          >
-            Auto Assign
-          </button>
+      {/* Confirmation Modal */}
+      {pendingAssignment && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl">
+            <h2 className="text-lg font-semibold text-[#1a1a2e] mb-2">Confirm Assignment</h2>
+            <p className="text-sm text-[#4a4a6a] mb-4">
+              The system has selected the following staff member based on your criteria:
+            </p>
+            <div className="bg-[#faf9f7] border border-[#e8e4dd] rounded-xl p-4 mb-4 space-y-1">
+              <p className="font-semibold text-[#1a1a2e]">{pendingAssignment.agent.name}</p>
+              <p className="text-sm text-[#4a4a6a]">{pendingAssignment.agent.role} · {pendingAssignment.agent.unit}</p>
+              <p className="text-xs text-[#4a4a6a] mt-2 italic">{pendingAssignment.note}</p>
+            </div>
+            <div className="flex gap-3">
+              <button onClick={() => setPendingAssignment(null)} className="flex-1 py-2.5 border border-[#e8e4dd] text-[#4a4a6a] font-medium rounded-xl hover:bg-[#faf9f7]">
+                Cancel
+              </button>
+              <button onClick={confirmAssignment} className="flex-1 py-2.5 bg-[#1a1a2e] text-white font-semibold rounded-xl hover:bg-[#252540]">
+                Confirm Assignment
+              </button>
+            </div>
+          </div>
         </div>
-        <div className="flex flex-col md:flex-row gap-4 md:items-end">
-          <select className="px-4 py-2 border rounded-lg w-full" value={manual.agentId} onChange={e => setManual({ ...manual, agentId: Number(e.target.value) })}>
-            <option value={0}>Select Agent</option>
-            {agents.map(a => <option key={a.id} value={a.id}>{a.name} ({a.unit})</option>)}
-          </select>
-          <button className="px-4 py-2 bg-slate-600 text-white rounded-lg font-semibold hover:bg-slate-700 transition w-full md:w-auto" onClick={handleManualAssign}>
-            Manual Assign
-          </button>
+      )}
+
+      {/* Assignment Panel */}
+      <div className="bg-white rounded-2xl border border-[#e8e4dd] p-5 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div>
+            <h2 className="font-semibold text-[#1a1a2e]">Auto-Assign Staff</h2>
+            <p className="text-xs text-[#4a4a6a] mt-0.5">The system will select the most suitable available staff member.</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <select
+              value={selectedUnit}
+              onChange={e => setSelectedUnit(e.target.value)}
+              className="px-3 py-2 border border-[#e8e4dd] rounded-lg text-sm bg-[#faf9f7] text-[#1a1a2e]"
+            >
+              <option value="">Any unit</option>
+              <option value="Care">Care</option>
+              <option value="Management">Management</option>
+              <option value="Operations">Operations</option>
+            </select>
+            <button
+              onClick={handleAutoAssignRequest}
+              className="px-5 py-2 bg-[#1a1a2e] text-white text-sm font-semibold rounded-xl hover:bg-[#252540] transition"
+            >
+              Auto-Assign
+            </button>
+          </div>
         </div>
+
+        <button
+          onClick={() => setShowAdvanced(!showAdvanced)}
+          className="flex items-center gap-1.5 text-xs text-[#4a4a6a] hover:text-[#1a1a2e] transition"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            {showAdvanced ? <path d="m18 15-6-6-6 6" /> : <path d="m6 9 6 6 6-6" />}
+          </svg>
+          {showAdvanced ? "Hide advanced options" : "Advanced: assign by location"}
+        </button>
+
+        {showAdvanced && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <div>
+              <label className="block text-xs text-[#4a4a6a] mb-1">Target Latitude</label>
+              <input type="text" placeholder="-37.8136" className="w-full px-3 py-2 border border-[#e8e4dd] rounded-lg text-sm" value={advancedLat} onChange={e => setAdvancedLat(e.target.value)} />
+            </div>
+            <div>
+              <label className="block text-xs text-[#4a4a6a] mb-1">Target Longitude</label>
+              <input type="text" placeholder="144.9631" className="w-full px-3 py-2 border border-[#e8e4dd] rounded-lg text-sm" value={advancedLng} onChange={e => setAdvancedLng(e.target.value)} />
+            </div>
+            <p className="col-span-full text-xs text-[#4a4a6a]">When coordinates are provided, the nearest available staff member will be selected.</p>
+          </div>
+        )}
       </div>
 
-      <div className="flex flex-col md:flex-row gap-4">
-        <input type="text" placeholder="Search by agent or role..." value={search} onChange={e => setSearch(e.target.value)} className="flex-1 px-6 py-3 rounded-2xl border bg-white shadow-sm" />
-        <select value={filter} onChange={e => setFilter(e.target.value)} className="px-6 py-3 rounded-2xl border bg-white shadow-sm">
+      {/* Search & Filter */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <input type="text" placeholder="Search by name or role..." value={search} onChange={e => setSearch(e.target.value)} className="flex-1 px-4 py-2.5 rounded-xl border border-[#e8e4dd] bg-white text-sm" />
+        <select value={filter} onChange={e => setFilter(e.target.value)} className="px-4 py-2.5 rounded-xl border border-[#e8e4dd] bg-white text-sm">
           <option value="All">All Units</option>
           <option value="Care">Care</option>
           <option value="Management">Management</option>
@@ -148,24 +216,30 @@ export default function AgenticRoster() {
         </select>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+      <div className="flex gap-4 text-sm">
+        <span className="text-[#4a4a6a]"><strong className="text-[#1a1a2e]">{agents.filter(a => a.status === "On Duty").length}</strong> on duty</span>
+        <span className="text-[#4a4a6a]"><strong className="text-[#1a1a2e]">{agents.filter(a => a.status === "Off Duty").length}</strong> off duty</span>
+        <span className="text-[#4a4a6a]">Showing <strong className="text-[#1a1a2e]">{filteredAgents.length}</strong> staff</span>
+      </div>
+
+      {/* Agent Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
         {filteredAgents.map(agent => (
-          <div key={agent.id} className="bg-white rounded-3xl p-6 shadow-sm border hover:shadow-md transition">
-            <div className="flex justify-between items-start">
+          <div key={agent.id} className="bg-white rounded-2xl p-5 border border-[#e8e4dd] hover:shadow-md transition">
+            <div className="flex justify-between items-start mb-3">
               <div>
-                <h3 className="text-lg font-bold text-slate-900">{agent.name}</h3>
-                <p className="text-xs text-slate-500">📍 {agent.location.lat.toFixed(4)}, {agent.location.lng.toFixed(4)}</p>
-                <p className="text-sm text-slate-500 mt-1">{agent.role}</p>
+                <h3 className="font-semibold text-[#1a1a2e]">{agent.name}</h3>
+                <p className="text-xs text-[#4a4a6a] mt-0.5">{agent.role}</p>
               </div>
-              <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${getStatusStyle(agent.status)}`}>
+              <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${getStatusStyle(agent.status)}`}>
                 {agent.status}
               </span>
             </div>
-            <div className="mt-6 space-y-2 text-sm text-slate-600">
-              <p><span className="font-semibold">Unit:</span> {agent.unit}</p>
-              <p><span className="font-semibold">Contact:</span> {agent.email}</p>
+            <div className="space-y-1 text-sm text-[#4a4a6a] mb-4">
+              <p><span className="font-medium text-[#1a1a2e]">Unit:</span> {agent.unit}</p>
+              <p><span className="font-medium text-[#1a1a2e]">Contact:</span> {agent.email}</p>
             </div>
-            <div className="mt-4">
+            <div className="rounded-xl overflow-hidden border border-[#e8e4dd]">
               <MiniMap location={agent.location} />
             </div>
           </div>
