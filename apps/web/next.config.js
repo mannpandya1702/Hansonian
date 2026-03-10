@@ -9,7 +9,7 @@ const nextConfig = {
         headers: [
           {
             key: 'Access-Control-Allow-Origin',
-            value: 'http://localhost:8000',
+            value: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
           },
         ],
       },
