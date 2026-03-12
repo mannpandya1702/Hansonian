@@ -80,7 +80,7 @@ export default function LoginGateway() {
     try {
       if (isFirebaseConfigured) {
         // ── Real Firebase Auth ──────────────────────────────
-        const credential = await signInWithEmailAndPassword(auth, email.trim(), password)
+        const credential = await signInWithEmailAndPassword(auth!, email.trim(), password)
         const user = credential.user
 
         // Get custom claims to determine role
