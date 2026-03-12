@@ -1,6 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
 
 export default function ComplianceVault() {
   const today = new Date();
@@ -34,7 +33,7 @@ export default function ComplianceVault() {
     },
   ];
 
-  const calculateStatus = (credentials: any[]) => {
+  const calculateStatus = (credentials: { type: string; expiry: string | null }[]) => {
     let hasMissing = false;
     let hasExpiring = false;
 

@@ -26,7 +26,7 @@ const employeeIcon = new L.DivIcon({
   iconAnchor: [15, 15],
 });
 
-export default function MiniMap({ location }: any) {
+export default function MiniMap({ location }: { location: { lat: number; lng: number } }) {
   return (
     <MapContainer
       center={[location.lat, location.lng]}

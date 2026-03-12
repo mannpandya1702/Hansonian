@@ -252,7 +252,7 @@ export default function Dashboard() {
 /* COMPONENTS */
 /* ============================= */
 
-function ExecMetric({ label, value, danger, success }: any) {
+function ExecMetric({ label, value, danger, success }: { label: string; value: string; danger?: boolean; success?: boolean }) {
   const border = danger
     ? "border-red-500"
     : success
@@ -269,7 +269,7 @@ function ExecMetric({ label, value, danger, success }: any) {
   )
 }
 
-function AlertExpandable({ alert }: any) {
+function AlertExpandable({ alert }: { alert: { id: number; title: string; severity: string; zone: string; description: string; trend: string } }) {
   const [open, setOpen] = useState(false)
 
   const severityBorder =
@@ -304,7 +304,7 @@ function AlertExpandable({ alert }: any) {
   )
 }
 
-function InsightCard({ title, description, impact }: any) {
+function InsightCard({ title, description, impact }: { title: string; description: string; impact: string }) {
   const impactStyles =
     impact === "Positive"
       ? "bg-[#4ade80]/20 text-[#15803d]"

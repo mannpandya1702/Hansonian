@@ -187,7 +187,7 @@ export default function EmployeeOps() {
   );
 }
 
-function KPI({ label, value }: any) {
+function KPI({ label, value }: { label: string; value: number }) {
   return (
     <div className="bg-white p-5 sm:p-6 rounded-2xl border border-[#e2ded6] hover:border-[#2d2d4f] transition-all duration-300 shadow-sm hover:shadow-md">
       <p className="text-xs sm:text-sm text-[#2d2d4f] font-medium">{label}</p>

@@ -163,7 +163,7 @@ export default function AdminDashboard() {
   )
 }
 
-function ExecMetric({ label, value, danger, success }: any) {
+function ExecMetric({ label, value, danger, success }: { label: string; value: string; danger?: boolean; success?: boolean }) {
   const border = danger ? "border-red-500" : success ? "border-[#4ade80]" : "border-[#1a1a2e]"
   return (
     <div className={`bg-[#faf9f7] border-2 ${border} p-5 rounded-xl`}>
@@ -173,7 +173,7 @@ function ExecMetric({ label, value, danger, success }: any) {
   )
 }
 
-function AlertExpandable({ alert }: any) {
+function AlertExpandable({ alert }: { alert: { id: number; title: string; severity: string; zone: string; description: string; trend: string } }) {
   const [open, setOpen] = useState(false)
   const severityBorder = alert.severity === "high" ? "border-red-500" : alert.severity === "medium" ? "border-yellow-500" : "border-green-500"
   return (
@@ -195,7 +195,7 @@ function AlertExpandable({ alert }: any) {
   )
 }
 
-function InsightCard({ title, description, impact }: any) {
+function InsightCard({ title, description, impact }: { title: string; description: string; impact: string }) {
   const impactStyles = impact === "Positive" ? "bg-[#4ade80]/20 text-[#15803d]" : impact === "Warning" ? "bg-yellow-100 text-yellow-700" : "bg-red-100 text-red-600"
   return (
     <div className="bg-[#faf9f7] border border-[#e8e4dd] rounded-xl p-5 space-y-3 hover:shadow-md transition">

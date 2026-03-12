@@ -79,10 +79,9 @@ const zoneRiskData = [
 
 export default function Dashboard() {
   return (
-    <div className="min-h-screen bg-[#faf9f7] text-[#1a1a2e] overflow-x-hidden pb-10">
-
+    <>
       {/* Page header */}
-      <div className="px-4 sm:px-6 md:px-10 pt-6 sm:pt-8 pb-6">
+      <div>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
             <h1
@@ -104,8 +103,6 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
-
-      <main className="px-4 sm:px-6 md:px-10 space-y-8">
 
         {/* FINANCIAL PULSE */}
         <section className="bg-white rounded-2xl border border-[#e8e4dd] p-4 sm:p-6 md:p-8 space-y-8">
@@ -243,8 +240,7 @@ export default function Dashboard() {
 
         </section>
 
-      </main>
-    </div>
+    </>
   )
 }
 
@@ -252,7 +248,7 @@ export default function Dashboard() {
 /* COMPONENTS */
 /* ============================= */
 
-function ExecMetric({ label, value, danger, success }: any) {
+function ExecMetric({ label, value, danger, success }: { label: string; value: string; danger?: boolean; success?: boolean }) {
   const border = danger
     ? "border-red-500"
     : success
@@ -269,7 +265,7 @@ function ExecMetric({ label, value, danger, success }: any) {
   )
 }
 
-function AlertExpandable({ alert }: any) {
+function AlertExpandable({ alert }: { alert: { id: number; title: string; severity: string; zone: string; description: string; trend: string } }) {
   const [open, setOpen] = useState(false)
 
   const severityBorder =
@@ -304,7 +300,7 @@ function AlertExpandable({ alert }: any) {
   )
 }
 
-function InsightCard({ title, description, impact }: any) {
+function InsightCard({ title, description, impact }: { title: string; description: string; impact: string }) {
   const impactStyles =
     impact === "Positive"
       ? "bg-[#4ade80]/20 text-[#15803d]"
