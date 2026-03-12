@@ -2,7 +2,9 @@
 
 import { useState } from "react"
 
-// ── US.A3: Strategic Alerts — Client Advocacy Agent ────────
+// ── US.A3: Strategic Alerts ─────────────────────────────────
+// Objective metrics only: incidents, missed sessions,
+// credential expiries, DEX deadlines. No subjective wellness.
 type Severity = "critical" | "high" | "medium" | "low"
 
 interface Alert {
@@ -10,7 +12,7 @@ interface Alert {
   title: string
   severity: Severity
   zone: string
-  category: "incident" | "wellness" | "compliance" | "staffing"
+  category: "incident" | "compliance" | "staffing" | "credential"
   description: string
   trend: string
   timestamp: string
@@ -21,51 +23,51 @@ interface Alert {
 const ALERTS_DATA: Alert[] = [
   {
     id: 1,
-    title: "Medication Non-Compliance — Zone 4",
+    title: "Missed Medication Support — Zone 4",
     severity: "critical",
     zone: "Zone 4",
     category: "incident",
-    description: "Medication non-compliance reported in 3 consecutive sessions for Participant P-019 (Sarah K.). Client Advocacy Agent flagged a -12% wellness trend over the past 14 days.",
-    trend: "-12% wellness drop",
+    description: "Medication support not delivered in 3 consecutive sessions for Participant P-019 (Sarah K.). NDIS incident report lodged. Immediate coordinator follow-up required.",
+    trend: "3 consecutive missed sessions",
     timestamp: "2026-02-27 09:14",
     status: "open",
     clientsAffected: 1,
   },
   {
     id: 2,
-    title: "Staff Burnout Risk — Zone 2",
+    title: "Overtime Threshold Exceeded — Zone 2",
     severity: "high",
     zone: "Zone 2",
     category: "staffing",
-    description: "Overtime hours exceeded the SCHADS threshold for 4 support workers this month. Continued at this rate risks staff attrition and service disruption.",
-    trend: "+18% workload increase",
+    description: "4 support workers have exceeded SCHADS contracted hours this month. Review rostering to prevent service disruption and award breach.",
+    trend: "+18% hours above contracted",
     timestamp: "2026-02-26 14:30",
     status: "acknowledged",
     clientsAffected: 8,
   },
   {
     id: 3,
-    title: "Declining Wellness Trend — Zone 3",
+    title: "DEX Submission Deadline — Zone 1",
     severity: "high",
-    zone: "Zone 3",
-    category: "wellness",
-    description: "Three participants in Zone 3 have shown a steady decline in DEX SCORE outcomes (Satisfaction metric) over the last 6 sessions. Immediate care plan review recommended.",
-    trend: "Avg satisfaction: 2.1/5",
-    timestamp: "2026-02-25 11:00",
-    status: "open",
-    clientsAffected: 3,
-  },
-  {
-    id: 4,
-    title: "DEX Documentation Gap — Zone 1",
-    severity: "medium",
     zone: "Zone 1",
     category: "compliance",
-    description: "8 sessions in Zone 1 are missing mandatory progress documentation. DEX submission deadline is in 12 days — immediate field follow-up required.",
-    trend: "DEX compliance risk +6%",
+    description: "8 sessions are missing mandatory SCORE documentation. DEX submission deadline is in 12 days — immediate field follow-up required to avoid non-compliance.",
+    trend: "8 sessions at risk",
     timestamp: "2026-02-25 08:45",
     status: "open",
     clientsAffected: 8,
+  },
+  {
+    id: 4,
+    title: "Credential Expiry — Zone 3",
+    severity: "medium",
+    zone: "Zone 3",
+    category: "credential",
+    description: "2 staff members in Zone 3 have credentials expiring within 30 days (NDIS Screening, First Aid). Service delivery will be suspended if not renewed.",
+    trend: "2 credentials expiring in <30 days",
+    timestamp: "2026-02-25 11:00",
+    status: "open",
+    clientsAffected: 4,
   },
   {
     id: 5,
@@ -81,11 +83,11 @@ const ALERTS_DATA: Alert[] = [
   },
   {
     id: 6,
-    title: "Low Satisfaction Rating — Zone 1",
+    title: "Low Session Rating — Zone 1",
     severity: "low",
     zone: "Zone 1",
-    category: "wellness",
-    description: "Participant P-003 rated their last 2 sessions at 1 star. Per the Feedback Escalation Policy, this has been automatically flagged for review.",
+    category: "incident",
+    description: "Participant P-003 rated their last 2 sessions at 1 star. Per the Feedback Escalation Policy, this has been automatically flagged for coordinator review.",
     trend: "2x consecutive 1-star ratings",
     timestamp: "2026-02-23 10:15",
     status: "resolved",
@@ -108,9 +110,9 @@ const STATUS_META: Record<string, { label: string; cls: string }> = {
 
 const CATEGORY_LABELS: Record<string, string> = {
   incident:   "Incident",
-  wellness:   "Wellness",
   compliance: "Compliance",
   staffing:   "Staffing",
+  credential: "Credential",
 }
 
 export default function StrategicAlertsPage() {
@@ -148,7 +150,7 @@ export default function StrategicAlertsPage() {
           Strategic Alerts
         </h1>
         <p className="text-sm text-[#4a4a6a] mt-1">
-          Client Advocacy Agent — high-risk incidents, wellness trends, and compliance flags
+          Incidents, missed sessions, credential expiries &amp; DEX submission deadlines
         </p>
       </div>
 
