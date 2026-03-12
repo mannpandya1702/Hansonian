@@ -1,53 +1,97 @@
-@override
-Widget build(BuildContext context) {
-  return Scaffold(
-    backgroundColor: Color(0xFFF8FAFC),
-    body: SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(32.0),
-        child: Column(
-          children: [
-            SizedBox(height: 20),
-            Text('CARE PULSE', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 4, color: Color(0xFF1A56DB))),
-            SizedBox(height: 60),
-            
-            // The Premium "Neumorphic" Clock-In Button
-            Container(
-              height: 280, width: 280,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Color(0xFF1A56DB),
-                boxShadow: [
-                  BoxShadow(color: Color(0x601A56DB), blurRadius: 40, offset: Offset(0, 20)),
-                ],
-              ),
-              child: ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF1A56DB),
-                  shape: CircleBorder(),
-                  elevation: 0,
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.timer_outlined, size: 80, color: Colors.white),
-                    SizedBox(height: 16),
-                    Text('CLOCK IN', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 20, letterSpacing: 1)),
-                  ],
-                ),
-              ),
-            ),
-            
-            SizedBox(height: 80),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text('SCHEDULED CLIENTS', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 10, color: Colors.slateGrey, letterSpacing: 1.5))
-            ),
-            // Client cards would go here...
-          ],
-        ),
+import 'package:flutter/material.dart';
+import 'features/auth/login_screen.dart';
+import 'features/shifts/shifts_screen.dart';
+import 'features/notes/notes_screen.dart';
+import 'features/incidents/incidents_screen.dart';
+
+// ── Hansonian Caregiver Mobile App ───────────────────────────────────────────
+// Entry point — sets up named routes for all 4 feature modules.
+// Firebase.initializeApp() should be called here once credentials are set.
+// ─────────────────────────────────────────────────────────────────────────────
+
+void main() {
+  // TODO: uncomment when Firebase credentials are available
+  // WidgetsFlutterBinding.ensureInitialized();
+  // await Firebase.initializeApp();
+  runApp(const HansonianApp());
+}
+
+class HansonianApp extends StatelessWidget {
+  const HansonianApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Hansonian Caregiver',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF1A1A2E)),
+        useMaterial3: true,
+        scaffoldBackgroundColor: const Color(0xFFFAF9F7),
+        fontFamily: 'Inter',
       ),
-    ),
-  );
+      initialRoute: '/login',
+      routes: {
+        '/login':     (_) => const LoginScreen(),
+        '/shifts':    (_) => const MainShell(initialIndex: 0),
+        '/notes':     (_) => const MainShell(initialIndex: 1),
+        '/incidents': (_) => const MainShell(initialIndex: 2),
+      },
+    );
+  }
+}
+
+// ── Bottom-nav shell wrapping all authenticated screens ──────────────────────
+class MainShell extends StatefulWidget {
+  final int initialIndex;
+  const MainShell({super.key, this.initialIndex = 0});
+
+  @override
+  State<MainShell> createState() => _MainShellState();
+}
+
+class _MainShellState extends State<MainShell> {
+  late int _index;
+
+  @override
+  void initState() {
+    super.initState();
+    _index = widget.initialIndex;
+  }
+
+  static const _screens = [
+    ShiftsScreen(),
+    NotesScreen(),
+    IncidentsScreen(),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: IndexedStack(index: _index, children: _screens),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _index,
+        onDestinationSelected: (i) => setState(() => _index = i),
+        backgroundColor: Colors.white,
+        indicatorColor: const Color(0xFF4ADE80).withAlpha(51),
+        destinations: const [
+          NavigationDestination(
+            icon:         Icon(Icons.schedule_outlined),
+            selectedIcon: Icon(Icons.schedule_rounded),
+            label:        'Shifts',
+          ),
+          NavigationDestination(
+            icon:         Icon(Icons.note_alt_outlined),
+            selectedIcon: Icon(Icons.note_alt_rounded),
+            label:        'Notes',
+          ),
+          NavigationDestination(
+            icon:         Icon(Icons.warning_amber_outlined),
+            selectedIcon: Icon(Icons.warning_amber_rounded),
+            label:        'Incidents',
+          ),
+        ],
+      ),
+    );
+  }
 }
