@@ -93,10 +93,10 @@ export default function LoginGateway() {
           return
         }
 
-        sessionStorage.setItem("hs_role",  role)
-        sessionStorage.setItem("hs_name",  user.displayName ?? user.email ?? "")
-        sessionStorage.setItem("hs_email", user.email ?? "")
-        sessionStorage.setItem("hs_uid",   user.uid)
+        localStorage.setItem("hs_role",  role)
+        localStorage.setItem("hs_name",  user.displayName ?? user.email ?? "")
+        localStorage.setItem("hs_email", user.email ?? "")
+        localStorage.setItem("hs_uid",   user.uid)
 
         window.location.href = PORTAL_PATHS[role as keyof typeof PORTAL_PATHS]
       } else {
@@ -108,9 +108,9 @@ export default function LoginGateway() {
           setLoading(false)
           return
         }
-        sessionStorage.setItem("hs_role",  demo.role)
-        sessionStorage.setItem("hs_name",  demo.name)
-        sessionStorage.setItem("hs_email", email.toLowerCase().trim())
+        localStorage.setItem("hs_role",  demo.role)
+        localStorage.setItem("hs_name",  demo.name)
+        localStorage.setItem("hs_email", email.toLowerCase().trim())
         window.location.href = PORTAL_PATHS[demo.role]
       }
     } catch (err: unknown) {
