@@ -1,0 +1,43 @@
+# Node
+**/node_modules
+**/.npm
+**/.pnp
+
+# Next.js build output
+**/.next
+**/out
+
+# Env files — never bake secrets into images
+**/.env
+**/.env.*
+!**/.env.example
+
+# Flutter
+caregiver-mobile/build
+caregiver-mobile/.dart_tool
+caregiver-mobile/.flutter-plugins
+caregiver-mobile/.flutter-plugins-dependencies
+caregiver-mobile/.packages
+
+# Git
+.git
+.gitignore
+.github
+
+# Docs / logs
+*.md
+*.log
+hs_err_pid*.log
+replay_pid*.log
+
+# Vercel
+**/.vercel
+
+# Test / lint artifacts
+**/coverage
+**/.nyc_output
+**/junit.xml
+
+# OS
+.DS_Store
+Thumbs.db
