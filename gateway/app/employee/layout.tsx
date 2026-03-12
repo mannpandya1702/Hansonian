@@ -24,7 +24,7 @@ export default function EmployeeLayout({
     if (role !== "employee") {
       router.replace("/");
     } else {
-      setReady(true);
+      setReady(true); // eslint-disable-line react-hooks/set-state-in-effect
     }
   }, [router]);
 

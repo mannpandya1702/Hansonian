@@ -30,6 +30,7 @@ const PERIOD_STATUS: Record<string, { label: string; cls: string }> = {
 }
 
 export default function DEXCompliancePage() {
+  const [now] = useState(() => Date.now())
   const [selectedPeriod, setSelectedPeriod] = useState("Q2 2026")
   const activePeriod = dexPeriods.find((p) => p.period === selectedPeriod) ?? dexPeriods[1]
   const complianceRate = activePeriod.sessions > 0
@@ -37,7 +38,7 @@ export default function DEXCompliancePage() {
     : 0
 
   const daysUntilDue = Math.ceil(
-    (new Date(activePeriod.due).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+    (new Date(activePeriod.due).getTime() - now) / (1000 * 60 * 60 * 24)
   )
 
   return (
