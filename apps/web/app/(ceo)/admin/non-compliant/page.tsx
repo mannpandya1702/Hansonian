@@ -29,11 +29,9 @@ export default function NonCompliantPage() {
   }
 
   return (
-    <div className="space-y-6 sm:space-y-8 px-4 sm:px-6 md:px-8">
-
-      {/* Header */}
+    <div className="space-y-6 sm:space-y-8">
       <div>
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold font-[var(--font-playfair)]">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">
           Non-Compliant Sessions
         </h1>
         <p className="text-gray-500 mt-2 text-sm sm:text-base">

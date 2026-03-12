@@ -79,10 +79,9 @@ const zoneRiskData = [
 
 export default function Dashboard() {
   return (
-    <div className="min-h-screen bg-[#faf9f7] text-[#1a1a2e] overflow-x-hidden pb-10">
-
+    <>
       {/* Page header */}
-      <div className="px-4 sm:px-6 md:px-10 pt-6 sm:pt-8 pb-6">
+      <div>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
             <h1
@@ -104,8 +103,6 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
-
-      <main className="px-4 sm:px-6 md:px-10 space-y-8">
 
         {/* FINANCIAL PULSE */}
         <section className="bg-white rounded-2xl border border-[#e8e4dd] p-4 sm:p-6 md:p-8 space-y-8">
@@ -243,8 +240,7 @@ export default function Dashboard() {
 
         </section>
 
-      </main>
-    </div>
+    </>
   )
 }
 
