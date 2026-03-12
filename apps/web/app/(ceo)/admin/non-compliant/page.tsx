@@ -29,9 +29,13 @@ export default function NonCompliantPage() {
   }
 
   return (
-    <div className="space-y-6 sm:space-y-8">
+    <div className="space-y-6 sm:space-y-8 px-4 sm:px-6 md:px-8">
+
+      {/* Header */}
       <div>
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">Non-Compliant Sessions</h1>
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold font-[var(--font-playfair)]">
+          Non-Compliant Sessions
+        </h1>
         <p className="text-gray-500 mt-2 text-sm sm:text-base">
           Review and resolve sessions missing mandatory compliance data.
         </p>
