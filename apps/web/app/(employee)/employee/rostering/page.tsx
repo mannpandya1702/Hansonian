@@ -130,7 +130,7 @@ export default function AgenticRoster() {
 
       {/* Confirmation Modal */}
       {pendingAssignment && (
-        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/40 z-[9999] flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl">
             <h2 className="text-lg font-semibold text-[#1a1a2e] mb-2">Confirm Assignment</h2>
             <p className="text-sm text-[#4a4a6a] mb-4">
@@ -225,7 +225,7 @@ export default function AgenticRoster() {
       {/* Agent Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
         {filteredAgents.map(agent => (
-          <div key={agent.id} className="bg-white rounded-2xl p-5 border border-[#e8e4dd] hover:shadow-md transition">
+          <div key={agent.id} className="bg-white rounded-2xl p-5 border border-[#e8e4dd] hover:shadow-md transition isolate">
             <div className="flex justify-between items-start mb-3">
               <div>
                 <h3 className="font-semibold text-[#1a1a2e]">{agent.name}</h3>
