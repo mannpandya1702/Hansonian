@@ -18,11 +18,11 @@ function AdminNav() {
   return (
     <header className="bg-[#1a1a2e] text-white">
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-10 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div className="flex items-center gap-6 flex-wrap">
+        <div className="flex items-center gap-6">
           <h1 className="text-lg sm:text-xl font-bold tracking-wide">
             Hansonium Agentic OS
           </h1>
-          <nav className="flex gap-2 flex-wrap">
+          <nav className="flex gap-2">
             <Link
               href="/admin"
               className={`px-3 py-1 rounded-lg text-sm font-medium transition ${
@@ -42,26 +42,6 @@ function AdminNav() {
               }`}
             >
               Non-Compliant
-            </Link>
-            <Link
-              href="/admin/alerts"
-              className={`px-3 py-1 rounded-lg text-sm font-medium transition ${
-                pathname === "/admin/alerts"
-                  ? "bg-white/20 text-white"
-                  : "text-white/60 hover:text-white hover:bg-white/10"
-              }`}
-            >
-              Alerts
-            </Link>
-            <Link
-              href="/admin/dex"
-              className={`px-3 py-1 rounded-lg text-sm font-medium transition ${
-                pathname === "/admin/dex"
-                  ? "bg-white/20 text-white"
-                  : "text-white/60 hover:text-white hover:bg-white/10"
-              }`}
-            >
-              DEX
             </Link>
           </nav>
         </div>
