@@ -67,7 +67,7 @@ export default function AgenticRoster() {
     let candidates = agents.filter(a => a.status === "On Duty");
     if (selectedUnit) candidates = candidates.filter(a => a.unit === selectedUnit);
     if (!candidates.length) {
-      setNotification("No available staff match the selected criteria.");
+      setNotification("No available agents match the selected criteria.");
       setTimeout(() => setNotification(""), 4000);
       return;
     }
