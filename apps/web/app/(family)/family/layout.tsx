@@ -12,6 +12,7 @@ export default function FamilyLayout({ children }: { children: React.ReactNode }
     if (role !== "family") {
       router.replace("/");
     } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setReady(true);
     }
   }, [router]);

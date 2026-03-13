@@ -241,9 +241,6 @@ const formatDate = (date: Date): string =>
 const formatTime = (date: Date): string =>
   new Intl.DateTimeFormat('en-AU', { hour: 'numeric', minute: '2-digit', hour12: true }).format(date);
 
-const formatCurrency = (amount: number): string =>
-  new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(amount);
-
 const formatCurrencyFull = (amount: number): string =>
   new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD' }).format(amount);
 
