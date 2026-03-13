@@ -41,9 +41,9 @@ const CloseIcon = () => (
 
 const NAV_ITEMS = [
   { name: "Dashboard",         path: "/employee/dashboard",  icon: HomeIcon,      description: "Workforce overview" },
-  { name: "Agentic Rostering", path: "/employee/rostering",  icon: CalendarIcon,  description: "Auto-fill roster" },
-  { name: "Compliance Vault",  path: "/employee/compliance", icon: ShieldIcon,    description: "Credential expiry" },
-  { name: "Session Review",     path: "/employee/dex-audit",  icon: ClipboardIcon, description: "Approve sessions" },
+  { name: "Agentic Rostering", path: "/employee/rostering",  icon: CalendarIcon,  description: "US.E1 — Auto-fill roster" },
+  { name: "Compliance Vault",  path: "/employee/compliance", icon: ShieldIcon,    description: "US.E2 — Credential expiry" },
+  { name: "Session Review",     path: "/employee/dex-audit",  icon: ClipboardIcon, description: "US.E3 — Approve sessions" },
   { name: "Staff Directory",   path: "/employee/staff",      icon: UsersIcon,     description: "Employee registry" },
 ];
 
@@ -58,9 +58,12 @@ export default function Sidebar({
   const router = useRouter();
 
   const handleLogout = () => {
+    sessionStorage.removeItem("hs_role");
+    sessionStorage.removeItem("hs_name");
+    sessionStorage.removeItem("hs_email");
     localStorage.removeItem("hs_role");
     localStorage.removeItem("hs_email");
-    router.push("/");
+    window.location.href = "/";
   };
 
   return (
@@ -93,7 +96,7 @@ export default function Sidebar({
 
         <div className="px-6 mb-5 shrink-0">
           <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest bg-white/10 text-white/80 px-2.5 py-1 rounded-full border border-white/15">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#4ade80]" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#4ade80] animate-pulse" />
             Employee &amp; Ops
           </span>
         </div>

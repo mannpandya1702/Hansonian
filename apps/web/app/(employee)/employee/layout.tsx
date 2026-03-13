@@ -20,7 +20,8 @@ export default function EmployeeLayout({
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const role = localStorage.getItem("hs_role");
+    const role =
+      sessionStorage.getItem("hs_role") ?? localStorage.getItem("hs_role");
     if (role !== "employee") {
       router.replace("/");
     } else {
