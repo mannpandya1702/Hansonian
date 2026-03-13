@@ -50,11 +50,12 @@ export default function ComplianceVault() {
     <div className="px-4 sm:px-6 md:px-10 py-8 max-w-7xl mx-auto bg-[#faf9f7] min-h-screen space-y-8">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-[#1a1a2e] tracking-tight">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-[#1a1a2e] tracking-tight"
+              style={{ fontFamily: "var(--font-playfair, Georgia, serif)" }}>
             Compliance Vault
           </h1>
           <p className="text-[#4a4a6a] text-sm mt-1">
-            Centralised credential monitoring & expiry tracking
+            US.E2 — Centralised credential monitoring &amp; expiry tracking
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
@@ -85,7 +86,7 @@ export default function ComplianceVault() {
                   <tr key={staff.name} className="hover:bg-[#faf9f7] transition-colors">
                     <td className="px-6 sm:px-10 py-5 font-semibold text-[#1a1a2e]">{staff.name}</td>
                     <td className="px-6 sm:px-10 py-5 text-[#4a4a6a] font-medium">{staff.role}</td>
-                    <td className="px-6 sm:px-10 py-5 space-y-2">
+                    <td className="px-10 py-6 space-y-2">
                       {staff.credentials.map((cred, index) => {
                         if (!cred.expiry) {
                           return <div key={index} className="text-xs font-semibold text-red-600">{cred.type} — Missing</div>;
