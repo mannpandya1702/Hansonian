@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 const HomeIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -47,15 +47,8 @@ const NAV_ITEMS = [
   { name: "Staff Directory",   path: "/employee/staff",      icon: UsersIcon,     description: "Employee registry" },
 ];
 
-export default function Sidebar({
-  isOpen,
-  closeSidebar,
-}: {
-  isOpen: boolean;
-  closeSidebar: () => void;
-}) {
+function SidebarContent({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
-  const router = useRouter();
 
   const handleLogout = () => {
     sessionStorage.removeItem("hs_role");
@@ -67,86 +60,113 @@ export default function Sidebar({
   };
 
   return (
+    <div className="flex flex-col h-full bg-[#1a1a2e] text-white">
+      {/* Logo + close */}
+      <div className="flex items-center justify-between px-6 pt-6 pb-5 shrink-0">
+        <div>
+          <p className="text-sm font-semibold tracking-[0.18em] uppercase text-white">HANSONIUM</p>
+          <div className="mt-1 h-[2px] w-7 bg-[#4ade80] rounded-full" />
+        </div>
+        {onClose && (
+          <button onClick={onClose} className="text-white/50 hover:text-white transition-colors lg:hidden">
+            <CloseIcon />
+          </button>
+        )}
+      </div>
+
+      {/* Role badge */}
+      <div className="px-6 mb-5 shrink-0">
+        <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest bg-white/10 text-white/80 px-2.5 py-1 rounded-full border border-white/15">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#4ade80] animate-pulse" />
+          Employee &amp; Ops
+        </span>
+      </div>
+
+      {/* Nav */}
+      <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto">
+        <p className="px-3 mb-2 text-[10px] font-bold uppercase tracking-widest text-white/30">
+          Main Menu
+        </p>
+        {NAV_ITEMS.map(({ name, path, icon: Icon, description }) => {
+          const isActive = pathname === path || (path !== "/" && pathname.startsWith(path));
+          return (
+            <Link
+              key={path}
+              href={path}
+              onClick={onClose}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all group ${
+                isActive
+                  ? "bg-white/10 text-white"
+                  : "text-white/60 hover:bg-white/6 hover:text-white"
+              }`}
+            >
+              <span className={`shrink-0 ${isActive ? "text-[#4ade80]" : "text-white/40 group-hover:text-white/70"}`}>
+                <Icon />
+              </span>
+              <div className="min-w-0">
+                <p className="text-sm font-medium truncate">{name}</p>
+                <p className="text-[10px] text-white/30 truncate">{description}</p>
+              </div>
+              {isActive && (
+                <span className="ml-auto w-1 h-1 rounded-full bg-[#4ade80] shrink-0" />
+              )}
+            </Link>
+          );
+        })}
+      </nav>
+
+      {/* User + logout */}
+      <div className="px-3 pb-6 pt-4 border-t border-white/8 shrink-0">
+        <div className="flex items-center gap-3 px-3 py-2 mb-1">
+          <div className="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white text-xs font-bold shrink-0">
+            E
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs font-semibold text-white truncate">Employee User</p>
+            <p className="text-[10px] text-white/40 truncate">Ops Portal</p>
+          </div>
+        </div>
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center gap-2.5 px-3 py-2 text-white/50 hover:text-white hover:bg-white/6 rounded-xl transition-all text-sm"
+        >
+          <LogoutIcon />
+          Sign Out
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export default function Sidebar({
+  isOpen,
+  closeSidebar,
+}: {
+  isOpen: boolean;
+  closeSidebar: () => void;
+}) {
+  return (
     <>
+      {/* Mobile overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
+          className="lg:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
           onClick={closeSidebar}
         />
       )}
 
-      <aside
-        className={`
-          fixed lg:static top-0 left-0 h-full w-64 z-50
-          bg-[#1a1a2e] text-white flex flex-col
-          transform transition-transform duration-300 ease-in-out
-          ${isOpen ? "translate-x-0" : "-translate-x-full"}
-          lg:translate-x-0
-        `}
+      {/* Mobile drawer */}
+      <div
+        className={`lg:hidden fixed top-0 left-0 h-full w-72 z-50 transform transition-transform duration-300 ease-in-out ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
       >
-        <div className="flex items-center justify-between px-6 pt-6 pb-5 shrink-0">
-          <div>
-            <p className="text-sm font-semibold tracking-[0.18em] uppercase text-white">HANSONIUM</p>
-            <div className="mt-1 h-[2px] w-7 bg-[#4ade80] rounded-full" />
-          </div>
-          <button onClick={closeSidebar} className="text-white/50 hover:text-white transition-colors lg:hidden">
-            <CloseIcon />
-          </button>
-        </div>
+        <SidebarContent onClose={closeSidebar} />
+      </div>
 
-        <div className="px-6 mb-5 shrink-0">
-          <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest bg-white/10 text-white/80 px-2.5 py-1 rounded-full border border-white/15">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#4ade80] animate-pulse" />
-            Employee &amp; Ops
-          </span>
-        </div>
-
-        <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto">
-          <p className="px-3 mb-2 text-[10px] font-bold uppercase tracking-widest text-white/30">
-            Main Menu
-          </p>
-          {NAV_ITEMS.map(({ name, path, icon: Icon, description }) => {
-            const isActive = pathname === path || pathname.startsWith(path);
-            return (
-              <Link
-                key={path}
-                href={path}
-                onClick={closeSidebar}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all group ${
-                  isActive ? "bg-white/10 text-white" : "text-white/60 hover:bg-white/6 hover:text-white"
-                }`}
-              >
-                <span className={`shrink-0 ${isActive ? "text-[#4ade80]" : "text-white/40 group-hover:text-white/70"}`}>
-                  <Icon />
-                </span>
-                <div className="min-w-0">
-                  <p className="text-sm font-medium truncate">{name}</p>
-                  <p className="text-[10px] text-white/30 truncate">{description}</p>
-                </div>
-                {isActive && <span className="ml-auto w-1 h-1 rounded-full bg-[#4ade80] shrink-0" />}
-              </Link>
-            );
-          })}
-        </nav>
-
-        <div className="px-3 pb-6 pt-4 border-t border-white/8 shrink-0">
-          <div className="flex items-center gap-3 px-3 py-2 mb-1">
-            <div className="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white text-xs font-bold shrink-0">
-              E
-            </div>
-            <div className="min-w-0">
-              <p className="text-xs font-semibold text-white truncate">Employee User</p>
-              <p className="text-[10px] text-white/40 truncate">Ops Portal</p>
-            </div>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-2.5 px-3 py-2 text-white/50 hover:text-white hover:bg-white/6 rounded-xl transition-all text-sm"
-          >
-            <LogoutIcon />
-            Sign Out
-          </button>
-        </div>
+      {/* Desktop sidebar — always visible, fixed width, never shrinks */}
+      <aside className="hidden lg:flex lg:flex-col w-64 shrink-0 min-h-screen">
+        <SidebarContent />
       </aside>
     </>
   );
