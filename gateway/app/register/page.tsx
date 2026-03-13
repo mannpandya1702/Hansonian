@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 const ROLES = [
   { value: "admin", label: "CEO / Admin", description: "Executive dashboard and compliance oversight" },
@@ -62,13 +63,13 @@ export default function RegisterPage() {
               Thank you, <strong>{firstName}</strong>. Your access request has been sent to the Hansonium admin team. You&apos;ll receive an email at <strong>{email}</strong> once your account is approved.
             </p>
           </div>
-          <a
+          <Link
             href="/"
             className="inline-flex items-center gap-2 px-6 py-3 bg-[#1a1a2e] text-white rounded-xl text-sm font-semibold hover:bg-[#252540] transition-all"
           >
             <BackIcon />
             Back to Login
-          </a>
+          </Link>
         </div>
       </div>
     );
@@ -79,10 +80,10 @@ export default function RegisterPage() {
       <div className="w-full max-w-[500px]">
 
         {/* Back link */}
-        <a href="/" className="inline-flex items-center gap-1 text-sm text-[#4a4a6a] hover:text-[#1a1a2e] transition-colors mb-6">
+        <Link href="/" className="inline-flex items-center gap-1 text-sm text-[#4a4a6a] hover:text-[#1a1a2e] transition-colors mb-6">
           <BackIcon />
           Back to Login
-        </a>
+        </Link>
 
         {/* Header */}
         <div className="mb-8">
