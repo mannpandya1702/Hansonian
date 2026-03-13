@@ -203,7 +203,7 @@ export interface TimelineEvent {
   description: string;
   shift?: Shift;
   caregiver?: CareTeamMember;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   isRead: boolean;
 }
 

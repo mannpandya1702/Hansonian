@@ -126,8 +126,8 @@ export function useParticipant(participantId: string) {
     // return () => unsubscribe();
 
     // Mock implementation for development
-    setLoading(false);
-    setParticipant(null);
+    const t = setTimeout(() => { setLoading(false); setParticipant(null); }, 0);
+    return () => clearTimeout(t);
   }, [participantId]);
 
   return { participant, loading, error };
@@ -165,8 +165,8 @@ export function useUpcomingShifts(participantId: string, limitCount: number = 10
     
     // return () => unsubscribe();
 
-    setLoading(false);
-    setShifts([]);
+    const t = setTimeout(() => { setLoading(false); setShifts([]); }, 0);
+    return () => clearTimeout(t);
   }, [participantId, limitCount]);
 
   return { shifts, loading, error };
@@ -201,8 +201,8 @@ export function useCareTeam(participantId: string) {
     
     // return () => unsubscribe();
 
-    setLoading(false);
-    setCareTeam([]);
+    const t = setTimeout(() => { setLoading(false); setCareTeam([]); }, 0);
+    return () => clearTimeout(t);
   }, [participantId]);
 
   return { careTeam, loading, error };
@@ -242,8 +242,8 @@ export function useTimelineEvents(participantId: string, limitCount: number = 20
     
     // return () => unsubscribe();
 
-    setLoading(false);
-    setEvents([]);
+    const t = setTimeout(() => { setLoading(false); setEvents([]); }, 0);
+    return () => clearTimeout(t);
   }, [participantId, limitCount]);
 
   return { events, loading, error };
@@ -279,8 +279,8 @@ export function useDocuments(participantId: string) {
     
     // return () => unsubscribe();
 
-    setLoading(false);
-    setDocuments([]);
+    const t = setTimeout(() => { setLoading(false); setDocuments([]); }, 0);
+    return () => clearTimeout(t);
   }, [participantId]);
 
   return { documents, loading, error };
@@ -318,7 +318,8 @@ export function useNotifications(userId: string) {
     
     // return () => unsubscribe();
 
-    setLoading(false);
+    const t = setTimeout(() => { setLoading(false); }, 0);
+    return () => clearTimeout(t);
   }, [userId]);
 
   return { notifications, unreadCount, loading };
