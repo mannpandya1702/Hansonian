@@ -8,8 +8,6 @@ import {
   Cell,
   BarChart,
   Bar,
-  LineChart,
-  Line,
   AreaChart,
   Area,
   CartesianGrid,
@@ -329,7 +327,7 @@ export default function Dashboard() {
                 <CartesianGrid stroke="#f0ede6" vertical={false} />
                 <XAxis dataKey="month" tick={{ fontSize: 12 }} />
                 <YAxis tickFormatter={(v) => `$${v / 1000}k`} tick={{ fontSize: 11 }} />
-                <Tooltip formatter={(v: number) => `$${v.toLocaleString()}`} />
+                <Tooltip formatter={(v: number | undefined) => v != null ? `$${v.toLocaleString()}` : ""} />
                 <Legend />
                 <ReferenceLine x="Apr" stroke="#e8e4dd" strokeDasharray="4 4" label={{ value: "Now", position: "top", fontSize: 10 }} />
                 <Area type="monotone" dataKey="actual"   stroke="#4ade80" strokeWidth={2} fill="url(#actualGrad)"   name="Actual Revenue"   connectNulls={false} />
