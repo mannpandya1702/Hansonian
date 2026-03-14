@@ -2,11 +2,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import '../../services/offline_queue.dart';
 
-// ── US.M2: GPS Clock-In + Active Shift Timer ─────────────────────────────────
+// ── US.M2: GPS Clock-In + Active Shift Timer + Offline Queue ──────────────────
 // M2-S08: Caregiver clocks in with GPS capture. Timer runs until clock-out.
-// GPS coords and timestamps are written to Firestore via the data-connector.
-// ────────────────────────────────────────────────────────────────────────────
+// Offline: records are queued locally and synced when connectivity resumes.
+// ─────────────────────────────────────────────────────────────────────────────
 
 enum ShiftStatus { idle, active, ended }
 
@@ -27,6 +29,13 @@ class _ShiftsScreenState extends State<ShiftsScreen> {
   bool        _locating  = false;
   String?     _error;
 
+  // Offline queue state
+  bool        _isOnline       = true;
+  int         _queuedCount    = 0;
+  bool        _syncing        = false;
+  String?     _syncMessage;
+  StreamSubscription<List<ConnectivityResult>>? _connectivitySub;
+
   static const _dark  = Color(0xFF1A1A2E);
   static const _green = Color(0xFF4ADE80);
   static const _muted = Color(0xFF4A4A6A);
@@ -38,6 +47,53 @@ class _ShiftsScreenState extends State<ShiftsScreen> {
     {'client': 'Robert M.',    'time': '13:30 – 15:30', 'zone': 'Zone 3', 'type': 'Community Access'},
     {'client': 'Patricia K.',  'time': '16:00 – 18:00', 'zone': 'Zone 1', 'type': 'Domestic Assist'},
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _initConnectivity();
+    _refreshQueueCount();
+  }
+
+  Future<void> _initConnectivity() async {
+    final results = await Connectivity().checkConnectivity();
+    _updateConnectivity(results);
+
+    _connectivitySub = Connectivity().onConnectivityChanged.listen((results) {
+      final wasOffline = !_isOnline;
+      _updateConnectivity(results);
+      if (wasOffline && _isOnline) {
+        _trySyncQueue(); // auto-sync when connection restored
+      }
+    });
+  }
+
+  void _updateConnectivity(List<ConnectivityResult> results) {
+    setState(() {
+      _isOnline = results.any((r) => r != ConnectivityResult.none);
+    });
+  }
+
+  Future<void> _refreshQueueCount() async {
+    final count = await OfflineQueue.count();
+    if (mounted) setState(() => _queuedCount = count);
+  }
+
+  Future<void> _trySyncQueue() async {
+    if (_syncing || _queuedCount == 0) return;
+    setState(() { _syncing = true; _syncMessage = null; });
+
+    final result = await OfflineQueue.flush();
+
+    await _refreshQueueCount();
+    setState(() {
+      _syncing     = false;
+      _syncMessage = result.summary;
+    });
+    Future.delayed(const Duration(seconds: 5), () {
+      if (mounted) setState(() => _syncMessage = null);
+    });
+  }
 
   Future<void> _clockIn() async {
     setState(() { _locating = true; _error = null; });
@@ -58,6 +114,22 @@ class _ShiftsScreenState extends State<ShiftsScreen> {
         _status      = ShiftStatus.active;
         _locating    = false;
       });
+
+      // Queue clock-in record (online: will sync immediately; offline: queued)
+      final record = OfflineShiftRecord(
+        type:      'clock_in',
+        shiftId:   'shift_${DateTime.now().millisecondsSinceEpoch}',
+        lat:       pos.latitude,
+        lng:       pos.longitude,
+        timestamp: DateTime.now().toIso8601String(),
+      );
+      if (_isOnline) {
+        // TODO: POST directly to data-connector /shifts/clock-in
+        await Future.delayed(const Duration(milliseconds: 100)); // stub
+      } else {
+        await OfflineQueue.enqueue(record);
+        await _refreshQueueCount();
+      }
     } catch (e) {
       setState(() {
         _error    = 'Could not get location. Check permissions and try again.';
@@ -68,11 +140,23 @@ class _ShiftsScreenState extends State<ShiftsScreen> {
 
   void _clockOut() {
     _timer?.cancel();
+    final clockOutTime = DateTime.now();
     setState(() {
-      _clockOutTime = DateTime.now();
+      _clockOutTime = clockOutTime;
       _status       = ShiftStatus.ended;
     });
-    // TODO: write shift record to Firestore via data-connector when credentials available
+
+    // Queue clock-out record
+    final record = OfflineShiftRecord(
+      type:      'clock_out',
+      shiftId:   'shift_active',
+      timestamp: clockOutTime.toIso8601String(),
+    );
+    if (_isOnline) {
+      // TODO: POST directly to data-connector /shifts/clock-out
+    } else {
+      OfflineQueue.enqueue(record).then((_) => _refreshQueueCount());
+    }
   }
 
   void _resetShift() {
@@ -96,6 +180,7 @@ class _ShiftsScreenState extends State<ShiftsScreen> {
   @override
   void dispose() {
     _timer?.cancel();
+    _connectivitySub?.cancel();
     super.dispose();
   }
 
@@ -114,6 +199,65 @@ class _ShiftsScreenState extends State<ShiftsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+
+            // ── Connectivity / Offline Banner ───────────────────────
+            if (!_isOnline)
+              Container(
+                margin: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFEF9C3),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFFFDE047)),
+                ),
+                child: Row(children: [
+                  const Icon(Icons.wifi_off_rounded, color: Color(0xFFB45309), size: 18),
+                  const SizedBox(width: 8),
+                  Expanded(child: Text(
+                    'You\'re offline. Shift records are queued locally and will sync when connection is restored.',
+                    style: const TextStyle(fontSize: 12, color: Color(0xFF92400E)),
+                  )),
+                ]),
+              ),
+
+            if (_isOnline && _queuedCount > 0)
+              GestureDetector(
+                onTap: _trySyncQueue,
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEFF6FF),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFF93C5FD)),
+                  ),
+                  child: Row(children: [
+                    _syncing
+                        ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF1D4ED8)))
+                        : const Icon(Icons.cloud_upload_outlined, color: Color(0xFF1D4ED8), size: 18),
+                    const SizedBox(width: 8),
+                    Expanded(child: Text(
+                      _syncing
+                          ? 'Syncing $_queuedCount queued record${_queuedCount > 1 ? "s" : ""}…'
+                          : 'Tap to sync $_queuedCount offline record${_queuedCount > 1 ? "s" : ""}',
+                      style: const TextStyle(fontSize: 12, color: Color(0xFF1D4ED8), fontWeight: FontWeight.w500),
+                    )),
+                  ]),
+                ),
+              ),
+
+            if (_syncMessage != null)
+              Container(
+                margin: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFDCFCE7),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFF86EFAC)),
+                ),
+                child: Text(_syncMessage!, style: const TextStyle(fontSize: 12, color: Color(0xFF16A34A))),
+              ),
+
             // ── Clock-In Card ───────────────────────────────────────
             _card(
               child: Column(
