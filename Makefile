@@ -63,7 +63,7 @@ setup:
 	done
 	@cd $(APPS_WEB) && npm ci && cd ../..
 	@echo "→ Flutter deps..."
-	@cd caregiver-mobile && flutter pub get && cd ..
+	@cd apps/mobile && flutter pub get && cd ../..
 	@echo "✓ Setup complete"
 
 # ── Dev servers ─────────────────────────────────────────────────────────────
@@ -147,10 +147,10 @@ cloud-build:
 
 # ── Flutter ──────────────────────────────────────────────────────────────────
 flutter-analyze:
-	cd caregiver-mobile && flutter analyze
+	cd apps/mobile && flutter analyze
 
 flutter-build:
-	cd caregiver-mobile && flutter build apk --release
+	cd apps/mobile && flutter build apk --release
 
 # ── Clean ─────────────────────────────────────────────────────────────────────
 clean:

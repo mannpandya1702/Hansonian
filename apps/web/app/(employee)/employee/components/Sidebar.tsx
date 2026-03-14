@@ -39,11 +39,18 @@ const CloseIcon = () => (
   </svg>
 );
 
+const CheckIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/>
+  </svg>
+);
+
 const NAV_ITEMS = [
   { name: "Dashboard",         path: "/employee/dashboard",  icon: HomeIcon,      description: "Workforce overview" },
   { name: "Agentic Rostering", path: "/employee/rostering",  icon: CalendarIcon,  description: "US.E1 — Auto-fill roster" },
   { name: "Compliance Vault",  path: "/employee/compliance", icon: ShieldIcon,    description: "US.E2 — Credential expiry" },
-  { name: "Session Review",     path: "/employee/dex-audit",  icon: ClipboardIcon, description: "US.E3 — Approve sessions" },
+  { name: "Session Review",    path: "/employee/dex-audit",  icon: ClipboardIcon, description: "US.E3 — Approve sessions" },
+  { name: "HIL Queue",         path: "/employee/hil-queue",  icon: CheckIcon,     description: "M3-S12 — Human-in-Loop gate" },
   { name: "Staff Directory",   path: "/employee/staff",      icon: UsersIcon,     description: "Employee registry" },
 ];
 

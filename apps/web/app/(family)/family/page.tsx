@@ -512,9 +512,40 @@ interface RatingModalProps {
 }
 
 const RatingModal = ({ isOpen, onClose }: RatingModalProps) => {
-  const [rating, setRating] = useState<number>(0);
-  const [feedback, setFeedback] = useState<string>('');
+  const [rating, setRating]       = useState<number>(0);
+  const [feedback, setFeedback]   = useState<string>('');
+  const [anonymous, setAnonymous] = useState<boolean>(false);
+  const [submitted, setSubmitted] = useState<boolean>(false);
+
   if (!isOpen) return null;
+
+  const handleSubmit = () => {
+    if (rating === 0) return;
+
+    if (rating <= 2) {
+      // M4-S15: Low rating escalation — trigger admin alert within 60s
+      // TODO: POST to data-connector /feedback/escalate { rating, feedback, anonymous, sessionId }
+      console.warn('[M4-S15] Low rating escalation triggered:', {
+        rating,
+        anonymous,
+        feedback: anonymous ? '[anonymous]' : feedback,
+        timestamp: new Date().toISOString(),
+      });
+    } else {
+      // TODO: POST to data-connector /feedback/submit { rating, feedback, anonymous }
+      console.info('[M4-S15] Feedback submitted:', { rating, anonymous });
+    }
+
+    setSubmitted(true);
+    setTimeout(() => {
+      setSubmitted(false);
+      setRating(0);
+      setFeedback('');
+      setAnonymous(false);
+      onClose();
+    }, 1800);
+  };
+
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl p-5 sm:p-6 max-w-md w-full">
@@ -522,41 +553,82 @@ const RatingModal = ({ isOpen, onClose }: RatingModalProps) => {
           <h3 className="text-lg font-bold text-gray-900">Rate Your Session</h3>
           <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-lg"><Icons.X /></button>
         </div>
-        <div className="flex items-center gap-4 mb-4 p-3 bg-gray-50 rounded-xl">
-          <Avatar firstName="Emma" lastName="Thompson" size="lg" />
-          <div>
-            <p className="font-semibold text-gray-900">Emma Thompson</p>
-            <p className="text-sm text-gray-500">Daily Personal Activities</p>
+
+        {submitted ? (
+          <div className="py-8 text-center space-y-2">
+            <div className="w-14 h-14 bg-[#4ade80]/20 rounded-full flex items-center justify-center mx-auto">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <p className="font-semibold text-gray-900">Thank you for your feedback!</p>
+            {rating <= 2 && <p className="text-xs text-amber-700">Our admin team has been alerted and will follow up within 60 minutes.</p>}
           </div>
-        </div>
-        <div className="text-center mb-4">
-          <p className="text-sm text-gray-600 mb-2">How was your experience?</p>
-          <div className="flex justify-center gap-2">
-            {[1, 2, 3, 4, 5].map((s) => (
-              <button key={s} onClick={() => setRating(s)} className={`w-10 h-10 ${rating >= s ? 'text-yellow-400' : 'text-gray-300'} hover:scale-110 transition-transform`}>
-                <svg viewBox="0 0 24 24" fill={rating >= s ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">
-                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                </svg>
+        ) : (
+          <>
+            <div className="flex items-center gap-4 mb-4 p-3 bg-gray-50 rounded-xl">
+              <Avatar firstName="Emma" lastName="Thompson" size="lg" />
+              <div>
+                <p className="font-semibold text-gray-900">Emma Thompson</p>
+                <p className="text-sm text-gray-500">Daily Personal Activities</p>
+              </div>
+            </div>
+
+            <div className="text-center mb-4">
+              <p className="text-sm text-gray-600 mb-2">How was your experience?</p>
+              <div className="flex justify-center gap-2">
+                {[1, 2, 3, 4, 5].map((s) => (
+                  <button key={s} onClick={() => setRating(s)} className={`w-10 h-10 ${rating >= s ? 'text-yellow-400' : 'text-gray-300'} hover:scale-110 transition-transform`}>
+                    <svg viewBox="0 0 24 24" fill={rating >= s ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {rating > 0 && rating <= 2 && (
+              <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-xl mb-4">
+                <Icons.AlertCircle />
+                <p className="text-sm text-amber-800">
+                  Low ratings are escalated to our admin team within 60 minutes for review and follow-up.
+                </p>
+              </div>
+            )}
+
+            <textarea
+              value={feedback}
+              onChange={(e) => setFeedback(e.target.value)}
+              placeholder="Additional feedback (optional)..."
+              className="w-full p-3 border border-gray-200 rounded-xl focus:border-[#4ade80] focus:ring-0 outline-none resize-none h-20 text-sm mb-3"
+            />
+
+            {/* M4-S15: Anonymous submission toggle */}
+            <label className="flex items-center gap-2.5 mb-4 cursor-pointer select-none">
+              <div
+                onClick={() => setAnonymous(!anonymous)}
+                className={`w-10 h-5 rounded-full transition-colors relative ${anonymous ? 'bg-[#1a1a2e]' : 'bg-gray-200'}`}
+              >
+                <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${anonymous ? 'translate-x-5' : 'translate-x-0.5'}`} />
+              </div>
+              <span className="text-sm text-gray-600">Submit anonymously</span>
+              {anonymous && <span className="text-xs text-[#4a4a6a] bg-gray-100 px-2 py-0.5 rounded-full">Your name won&apos;t be shared</span>}
+            </label>
+
+            <div className="flex gap-3">
+              <button onClick={onClose} className="flex-1 py-2.5 border border-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-50">Cancel</button>
+              <button
+                onClick={handleSubmit}
+                disabled={rating === 0}
+                className={`flex-1 py-2.5 font-semibold rounded-xl disabled:opacity-50 transition ${
+                  rating > 0 && rating <= 2
+                    ? 'bg-amber-500 text-white hover:bg-amber-600'
+                    : 'bg-[#4ade80] text-[#1a1a2e] hover:bg-[#22c55e]'
+                }`}
+              >
+                {rating > 0 && rating <= 2 ? 'Submit & Notify Admin' : 'Submit Feedback'}
               </button>
-            ))}
-          </div>
-        </div>
-        {rating > 0 && rating <= 2 && (
-          <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-xl mb-4">
-            <Icons.AlertCircle />
-            <p className="text-sm text-amber-800">Low ratings are escalated to our admin team for review.</p>
-          </div>
+            </div>
+          </>
         )}
-        <textarea
-          value={feedback}
-          onChange={(e) => setFeedback(e.target.value)}
-          placeholder="Additional feedback (optional)..."
-          className="w-full p-3 border border-gray-200 rounded-xl focus:border-[#4ade80] focus:ring-0 outline-none resize-none h-20 text-sm mb-4"
-        />
-        <div className="flex gap-3">
-          <button onClick={onClose} className="flex-1 py-2.5 border border-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-50">Cancel</button>
-          <button onClick={onClose} disabled={rating === 0} className="flex-1 py-2.5 bg-[#4ade80] text-[#1a1a2e] font-semibold rounded-xl hover:bg-[#22c55e] disabled:opacity-50">Submit</button>
-        </div>
       </div>
     </div>
   );
