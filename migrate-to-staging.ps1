@@ -81,7 +81,7 @@ $mobileDst = "$StagingRepo\apps\mobile"
 
 Log-OK "Hansonian : $HansonianRepo"
 Log-OK "Staging   : $StagingRepo"
-if ($DryRun) { Log-Warn "DRY RUN — no files will be copied or committed" }
+if ($DryRun) { Log-Warn "DRY RUN - no files will be copied or committed" }
 
 # ── 1. Confirm staging repo branch ──────────────────────────────────────────
 
@@ -128,7 +128,7 @@ foreach ($f in $webFiles) {
     if ((Test-Path $s) -and (Test-Path $d)) {
         $diff = Compare-Object (Get-Content $s) (Get-Content $d) -ErrorAction SilentlyContinue
         if ($diff) {
-            Log-Warn "DIFFERS: apps/web/$f  (your source wins — review if staging had intentional changes)"
+            Log-Warn "DIFFERS: apps/web/$f  (your source wins - review if staging had intentional changes)"
         } else {
             Log-OK   "SAME   : apps/web/$f"
         }
@@ -173,7 +173,7 @@ $webRootFiles = @(
     "eslint.config.mjs",
     "components.json",
     "Dockerfile"
-    # NOTE: vercel.json intentionally excluded — staging uses Docker, not Vercel
+    # NOTE: vercel.json intentionally excluded - staging uses Docker, not Vercel
 )
 
 foreach ($f in $webRootFiles) {
@@ -182,7 +182,7 @@ foreach ($f in $webRootFiles) {
         Safe-Copy $src "$webDst\$f"
         Log-OK "web/$f"
     } else {
-        Log-Warn "web/$f not found in source — skipped"
+        Log-Warn "web/$f not found in source - skipped"
     }
 }
 
@@ -202,14 +202,14 @@ Log-OK "web/shared/components/"
 Safe-CopyDir "$webSrc\lib" "$webDst\lib"
 Log-OK "web/lib/"
 
-# 3e. .env.example — only if staging does not already have any .env* file
+# 3e. .env.example - only if staging does not already have any .env* file
 $hasEnv = Get-ChildItem -Path $webDst -Filter ".env*" -ErrorAction SilentlyContinue
 $envEx  = "$webSrc\.env.example"
 if (-not $hasEnv -and (Test-Path $envEx)) {
     Safe-Copy $envEx "$webDst\.env.example"
     Log-OK "web/.env.example (no existing .env in staging)"
 } else {
-    Log-OK "web/.env — staging already has one or no .env.example exists, skipped"
+    Log-OK "web/.env - staging already has one or no .env.example exists, skipped"
 }
 
 # ── 4. Migrate apps/mobile ───────────────────────────────────────────────────
@@ -226,19 +226,19 @@ foreach ($f in $mobileRootFiles) {
     }
 }
 
-# 4b. pubspec.lock — only if staging does not already have one
+# 4b. pubspec.lock - only if staging does not already have one
 $stagingLock = "$mobileDst\pubspec.lock"
 $sourceLock  = "$mobileSrc\pubspec.lock"
 if (-not (Test-Path $stagingLock) -and (Test-Path $sourceLock)) {
     Safe-Copy $sourceLock $stagingLock
     Log-OK "mobile/pubspec.lock (staging had none)"
 } elseif (Test-Path $stagingLock) {
-    Log-Warn "mobile/pubspec.lock already exists in staging — NOT overwriting. Run 'flutter pub get' after migration."
+    Log-Warn "mobile/pubspec.lock already exists in staging - NOT overwriting. Run 'flutter pub get' after migration."
 } else {
-    Log-Warn "mobile/pubspec.lock not found in source — run 'flutter pub get' in apps/mobile after migration"
+    Log-Warn "mobile/pubspec.lock not found in source - run 'flutter pub get' in apps/mobile after migration"
 }
 
-# 4c. lib/ — all Dart source files
+# 4c. lib/ - all Dart source files
 $mobileExclude = @(
     "build",
     ".dart_tool"
@@ -314,7 +314,7 @@ if (-not $DryRun) {
 
     $staged = git diff --cached --name-only 2>&1
     if (-not $staged) {
-        Log-OK "Nothing new to commit — staging was already up to date."
+        Log-OK "Nothing new to commit - staging was already up to date."
         Pop-Location
     } else {
         Write-Host "`n    Files staged for commit:" -ForegroundColor Cyan
@@ -322,7 +322,7 @@ if (-not $DryRun) {
 
         $ans = Read-Host "`n    Commit and push? (y/N)"
         if ($ans -notmatch '^[Yy]$') {
-            Log-Warn "Skipped commit. Files are staged — run 'git commit' manually when ready."
+            Log-Warn "Skipped commit. Files are staged - run 'git commit' manually when ready."
             Pop-Location
         } else {
             $msg = @"
@@ -378,7 +378,7 @@ Log-Step "Post-migration validation steps to run manually"
 
 Write-Host @"
 
-  WEB — run inside $StagingRepo\apps\web:
+  WEB - run inside $StagingRepo\apps\web:
     npm install
     npx tsc --noEmit
     npm run build
@@ -390,7 +390,7 @@ Write-Host @"
     #                 /employee/dex-audit  /employee/hil-queue  /employee/staff
     #   /family
 
-  MOBILE — run inside $StagingRepo\apps\mobile:
+  MOBILE - run inside $StagingRepo\apps\mobile:
     flutter pub get
     flutter analyze
     # Expected: No issues found
