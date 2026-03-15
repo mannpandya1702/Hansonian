@@ -47,6 +47,7 @@ dependencies:
 
   # Voice recording (M3-S13 — voice report + transcript preview)
   record: ^5.2.0
+  path_provider: ^2.1.0
 
   # Offline queue + sync (M2-S08 — offline mode support)
   connectivity_plus: ^6.0.0
