@@ -45,6 +45,14 @@ dependencies:
   # Camera / media (M3-S13 — photo upload on incidents)
   image_picker: ^1.1.0
 
+  # Voice recording (M3-S13 — voice report + transcript preview)
+  record: ^5.2.0
+  path_provider: ^2.1.0
+
+  # Offline queue + sync (M2-S08 — offline mode support)
+  connectivity_plus: ^6.0.0
+  shared_preferences: ^2.2.0
+
   # State management
   flutter_riverpod: ^2.5.0
 
