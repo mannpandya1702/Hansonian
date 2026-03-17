@@ -62,7 +62,7 @@ export function AdminSidebarContent({ onClose }: { onClose?: () => void }) {
   return (
     <div className="flex flex-col h-full bg-[#1a1a2e] text-white">
       {/* Logo + close button */}
-      <div className="flex items-center justify-between px-6 pt-6 pb-5">
+      <div className="shrink-0 flex items-center justify-between px-6 pt-6 pb-5">
         <div>
           <p className="text-sm font-semibold tracking-[0.18em] uppercase text-white">HANSONIUM</p>
           <div className="mt-1 h-[2px] w-7 bg-[#4ade80] rounded-full" />
@@ -75,7 +75,7 @@ export function AdminSidebarContent({ onClose }: { onClose?: () => void }) {
       </div>
 
       {/* Role badge */}
-      <div className="px-6 mb-6">
+      <div className="shrink-0 px-6 mb-6">
         <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest bg-[#4ade80]/15 text-[#4ade80] px-2.5 py-1 rounded-full border border-[#4ade80]/25">
           <span className="w-1.5 h-1.5 rounded-full bg-[#4ade80] animate-pulse" />
           CEO / Admin
@@ -88,7 +88,7 @@ export function AdminSidebarContent({ onClose }: { onClose?: () => void }) {
           Main Menu
         </p>
         {NAV_ITEMS.map(({ label, path, icon: Icon, description }) => {
-          const isActive = pathname === path;
+          const isActive = path === "/admin" ? pathname === path : pathname.startsWith(path);
           return (
             <Link
               key={path}
@@ -116,7 +116,7 @@ export function AdminSidebarContent({ onClose }: { onClose?: () => void }) {
       </nav>
 
       {/* User info + logout */}
-      <div className="px-3 pb-6 pt-4 border-t border-white/8">
+      <div className="shrink-0 px-3 pb-6 pt-4 border-t border-white/8">
         <div className="flex items-center gap-3 px-3 py-2 mb-1">
           <div className="w-8 h-8 rounded-full bg-[#4ade80]/20 border border-[#4ade80]/30 flex items-center justify-center text-[#4ade80] text-xs font-bold shrink-0">
             A
