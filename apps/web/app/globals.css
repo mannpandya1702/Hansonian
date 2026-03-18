@@ -39,3 +39,10 @@ body {
 .font-mono {
   font-family: var(--font-mono);
 }
+
+/* Leaflet z-index override — keep map tiles/controls below modal overlays (z-50) */
+.leaflet-pane,
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 10 !important;
+}

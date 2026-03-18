@@ -290,7 +290,6 @@ class _IncidentsScreenState extends State<IncidentsScreen>
             ],
           ),
         ),
-      ),
     );
   }
 
